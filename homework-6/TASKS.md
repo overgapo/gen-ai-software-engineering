@@ -1,18 +1,18 @@
-# 🏦 Homework 6: Final Capstone — AI-Powered Multi-Agent Banking Pipeline
+# 🏦 Homework 6: Final Capstone — AI-Powered Transaction Processing Pipeline
 
 ## Overview
 
-This is your final capstone. You will build **four meta-agents** (AI/automation workflows) that **create** a **transaction processing system** from scratch. Each agent has a distinct role: one produces the specification, one the code, one the tests, and one the documentation. The **output** of these agents is a working transaction processing pipeline (e.g. validator, fraud detection, settlement); the **deliverable** is both the four meta-agents and the resulting system. No starter code is provided.
+This is your final capstone. You will use **four AI workflow agents** to build a **transaction processing pipeline** from scratch. Each agent has a distinct role in your development workflow: one produces the specification, one the code, one the tests, and one the documentation. The **output** is a working pipeline (e.g. validation, fraud detection, settlement) with a simple front-end; the **deliverable** is the pipeline system plus the skills, hooks, and MCP integrations that powered your workflow. No starter code is provided.
 
 **This assignment is language-agnostic.** Implement the pipeline in the language and framework of your choice (e.g. Python, Node.js, Java, Go). Examples in this document may use one stack; equivalent commands and patterns in your chosen stack are acceptable.
 
 ---
 
-## Four agents (your deliverables)
+## Four agents (your workflow deliverables)
 
 | Agent | Role | Plus (skill / MCP / hook / requirement) |
 |-------|------|----------------------------------------|
-| **Agent 1 — Specification** | Creates detailed technical specification for the transaction processing system | **Skill**: A slash command that produces a specification following the given template (e.g. `.../commands/write-spec.md`). |
+| **Agent 1 — Specification** | Creates detailed technical specification for the transaction processing pipeline | **Skill**: A slash command that produces a specification following the given template (e.g. `.../commands/write-spec.md`). |
 | **Agent 2 — Code generation** | Generates the transaction processing pipeline code (validator, fraud detector, etc.) | **MCP context7**: Used during code generation to look up a **specific framework**; document 2+ context7 queries in `research-notes.md`. |
 | **Agent 3 — Unit tests** | Creates unit tests with the required coverage | **Hook**: Verifies unit test coverage and **blocks push** if coverage is **below 80%**. |
 | **Agent 4 — Documentation** | Generates README and project documentation | **Requirement**: README (and/or docs) must **include the student's name** (e.g. author or "Created by"). |
@@ -26,6 +26,8 @@ This is your final capstone. You will build **four meta-agents** (AI/automation 
 ### Task 1 ⭐⭐ — Agent 1: Write the Specification (Required)
 
 **Agent 1** produces the detailed technical specification. Before writing any code, write a complete project specification. Use the template in `specification-TEMPLATE-hint.md` (this folder) and the full template from Homework 3 as reference.
+
+You may optionally use a **specification framework** where it helps clarify pipeline behavior. The framework is optional; `specification.md` remains the primary deliverable.
 
 #### Required files
 - `specification.md` — Full project spec (see structure below)
@@ -41,12 +43,12 @@ One sentence describing what your pipeline does.
 Concrete, testable requirements. Example:
 - Transactions above $10,000 are flagged for fraud review with a risk score
 - Rejected transactions are written to `shared/results/` with a reason field
-- All agent operations are logged with ISO 8601 timestamps
+- All pipeline stages log operations with ISO 8601 timestamps
 
 **3. Implementation Notes**
 - Monetary values: use precise decimal/numeric types for amounts (e.g. `decimal.Decimal` in Python — never `float`)
 - Currency codes: ISO 4217 (USD, EUR, GBP, JPY…)
-- Logging: audit trail with timestamp, agent name, transaction ID, and outcome
+- Logging: audit trail with timestamp, stage name, transaction ID, and outcome
 - PII: treat account numbers and names as sensitive — no plaintext logging
 
 **4. Context**
@@ -54,43 +56,43 @@ Concrete, testable requirements. Example:
 - Ending state: processed results in `shared/results/`, a pipeline summary report, test coverage ≥ 90%
 
 **5. Low-Level Tasks**
-One entry per agent. Each entry must follow this format:
+One entry per pipeline stage. Each entry must follow this format:
 ```
-Task: [Agent Name]
+Task: [Pipeline Stage Name]
 Prompt: "[Exact prompt you will give Claude Code or Copilot]"
-File to CREATE: e.g. agents/[agent_name].py (or equivalent in your language)
-Function to CREATE: e.g. process_message(message: dict) -> dict
-Details: [What the agent checks, transforms, or decides]
+File to CREATE: e.g. pipeline/validator.py (or equivalent in your language)
+Function to CREATE: e.g. process_transaction(record: dict) -> dict
+Details: [What the stage checks, transforms, or decides]
 ```
 
 ---
 
-### Task 2 ⭐⭐⭐ — Agent 2: Build the Multi-Agent Pipeline (Required)
+### Task 2 ⭐⭐⭐ — Agent 2: Build the Transaction Processing Pipeline (Required)
 
-**Agent 2** (code-generation agent) implements the pipeline you specified in Task 1. Build **at least 3 cooperating agents**. Use **MCP context7** during code generation to look up your chosen framework (e.g. libraries, APIs); document at least 2 context7 queries in `research-notes.md` (see Task 4).
+**Agent 2** (code-generation agent) implements the pipeline you specified in Task 1. Build **at least 3 pipeline stages** that process transactions in sequence. Use **MCP context7** during code generation to look up your chosen framework (e.g. libraries, APIs); document at least 2 context7 queries in `research-notes.md` (see Task 4).
 
-#### Required agents (minimum)
-1. **Transaction Validator** — checks required fields, valid amounts, ISO 4217 currency
-2. **Fraud Detector** — scores transactions for risk (high-value, unusual timing, cross-border)
-3. **At least one of**: Compliance Checker, Settlement Processor, or Reporting Agent
+#### Required pipeline stages (minimum)
+1. **Validation Stage** — checks required fields, valid amounts, ISO 4217 currency
+2. **Fraud Detection Stage** — scores transactions for risk (high-value, unusual timing, cross-border)
+3. **At least one of**: Compliance Check, Settlement Processing, or Reporting
 
-#### File-based communication protocol
-Agents pass messages as JSON files through shared directories:
+#### File-based pipeline protocol
+Stages pass data as JSON files through shared directories:
 ```
 shared/
-├── input/       ← integrator drops initial messages here
-├── processing/  ← agent moves message here while working
-├── output/      ← agent writes result here for next agent
+├── input/       ← orchestrator drops initial records here
+├── processing/  ← stage moves record here while working
+├── output/      ← stage writes result here for the next stage
 └── results/     ← final outcomes land here
 ```
 
-Standard message format:
+Standard record format between stages:
 ```json
 {
   "message_id": "uuid4-string",
   "timestamp": "2026-03-16T10:00:00Z",
-  "source_agent": "transaction_validator",
-  "target_agent": "fraud_detector",
+  "source_stage": "validator",
+  "target_stage": "fraud_detector",
   "message_type": "transaction",
   "data": {
     "transaction_id": "TXN001",
@@ -102,12 +104,21 @@ Standard message format:
 ```
 
 #### Required files
-- Integrator/orchestrator (e.g. `integrator.py`, `main.js`) — sets up directories, loads `sample-transactions.json`, starts agents in order, monitors results
-- Agent modules (e.g. `agents/transaction_validator.py`, `agents/fraud_detector.py`, `agents/[your_third_agent].py`)
+- Orchestrator/runner (e.g. `orchestrator.py`, `main.js`) — sets up directories, loads `sample-transactions.json`, runs stages in order, monitors results
+- Pipeline stage modules (e.g. `pipeline/validator.py`, `pipeline/fraud_detector.py`, `pipeline/[your_third_stage].py`)
 - `research-notes.md` — document at least 2 context7 queries you made while building (see Task 4)
 
+#### Simple front-end (required)
+
+Generate a **simple front-end** that lets a user interact with or observe the pipeline. Examples:
+- A web page that triggers a pipeline run and displays results from `shared/results/`
+- A dashboard showing transaction status, pass/fail counts, and rejection reasons
+- A minimal CLI with formatted output counts as a front-end only if a graphical or web UI is not feasible; prefer a web UI when possible
+
+Commit front-end source under e.g. `frontend/` or `web/` and document how to run it in `HOWTORUN.md`.
+
 #### Deliverable check
-Run the pipeline (e.g. `python integrator.py` or `npm run pipeline`). All transactions from `sample-transactions.json` should appear in `shared/results/`.
+Run the pipeline (e.g. `python orchestrator.py` or `npm run pipeline`). All transactions from `sample-transactions.json` should appear in `shared/results/`.
 
 ---
 
@@ -122,12 +133,12 @@ Create these files in `.../commands/`:
 **`.../commands/run-pipeline.md`**
 A slash command that runs the full pipeline:
 ```markdown
-Run the multi-agent banking pipeline end-to-end.
+Run the transaction processing pipeline end-to-end.
 
 Steps:
 1. Check that sample-transactions.json exists
 2. Clear shared/ directories
-3. Run the pipeline (e.g. python integrator.py or npm run pipeline)
+3. Run the pipeline (e.g. python orchestrator.py or npm run pipeline)
 4. Show a summary of results from shared/results/
 5. Report any transactions that were rejected and why
 ```
@@ -138,7 +149,7 @@ A slash command that validates transactions without running the full pipeline:
 Validate all transactions in sample-transactions.json without processing them.
 
 Steps:
-1. Run the validator in dry-run mode (e.g. python agents/transaction_validator.py --dry-run)
+1. Run the validator stage in dry-run mode (e.g. python pipeline/validator.py --dry-run)
 2. Report: total count, valid count, invalid count, reasons for rejection
 3. Show a table of results
 ```
@@ -228,27 +239,33 @@ Use your runtime if not Python (e.g. `node mcp/server.js` for Node).
 **Agent 4** produces tests and documentation. Write a test suite and generate README/docs (see below).
 
 #### Tests
-Write a test suite in `tests/` (or your stack's test directory) covering each agent and the integration path.
+Write a test suite in `tests/` (or your stack's test directory) covering each pipeline stage and the integration path.
 
 Requirements:
 - Coverage **gate**: hook blocks push if below 80% (see Task 3). Aim for ≥ 90% where possible.
-- At minimum: unit tests for each agent + 1 integration test for the full pipeline
+- At minimum: unit tests for each stage + 1 integration test for the full pipeline
 - Isolate tests from real `shared/` (e.g. use `tmp_path` or equivalent)
 
 #### Documentation (Agent 4)
 - `README.md` — must include:
   - **Your name** (e.g. in author line or "Created by [Your Name]")
   - What the system does (1–2 paragraphs)
-  - Agent responsibilities (one bullet per agent)
+  - Pipeline stage responsibilities (one bullet per stage)
   - ASCII architecture diagram showing the pipeline flow
   - Tech stack table
-- `HOWTORUN.md` — step-by-step
+- `HOWTORUN.md` — step-by-step (pipeline, front-end, and tests)
 
+#### Presentation (required)
+
+Generate a **presentation** summarizing your capstone project (architecture, pipeline stages, demo, lessons learned). Requirements:
+- Commit the presentation as a **PDF** in the repo (e.g. `docs/presentation.pdf`)
+- **Embed or link the PDF in your PR description** so reviewers can open it without cloning
 
 #### Screenshots (save in `docs/screenshots/`)
 | Screenshot | What to capture |
 |---|---|
-| `pipeline-run.png` | Full terminal output of running the pipeline (e.g. `python integrator.py`) |
+| `pipeline-run.png` | Full terminal output of running the pipeline (e.g. `python orchestrator.py`) |
+| `frontend.png` | Your simple front-end showing pipeline results or status |
 | `test-coverage.png` | Coverage report showing ≥ 80% (gate) and ideally ≥ 90% |
 | `skill-run-pipeline.png` | `/run-pipeline` skill executing |
 | `hook-trigger.png` | Your coverage gate hook firing (or blocking push) |
@@ -256,14 +273,15 @@ Requirements:
 
 ---
 
-## Submission: screenshots and PR description
+## Submission: screenshots, presentation, and PR description
 
 **Screenshot every major step** and include them in your pull request:
 
 - Save all screenshots in `docs/screenshots/` (see table above).
+- Commit `docs/presentation.pdf` and **link or embed it in your PR description**.
 - **Include the same screenshots in your PR description** (embedded or linked) so reviewers can see each step without opening the repo.
 
-PR description should include screenshots for: spec produced, pipeline run, tests/coverage, skill/hook in action, MCP usage, and README (with your name).
+PR description should include: spec produced, pipeline run, front-end demo, tests/coverage, skill/hook in action, MCP usage, README (with your name), and the presentation PDF.
 
 ---
 
@@ -276,7 +294,8 @@ PR description should include screenshots for: spec produced, pipeline run, test
 - [ ] Skill that generates specification from the template (e.g. `.../commands/write-spec.md`)
 
 **Pipeline (Task 2 / Agent 2)**
-- [ ] Integrator/orchestrator and agent modules (e.g. `integrator.py`, `agents/transaction_validator.py`, etc.)
+- [ ] Orchestrator/runner and pipeline stage modules (e.g. `orchestrator.py`, `pipeline/validator.py`, etc.)
+- [ ] Simple front-end (e.g. `frontend/` or `web/`)
 - [ ] `research-notes.md` (2+ context7 queries documented)
 
 **Skills & Hooks (Task 3 / Agent 3)**
@@ -292,8 +311,9 @@ PR description should include screenshots for: spec produced, pipeline run, test
 - [ ] `tests/` directory with test files
 - [ ] `README.md` (must include **your name**)
 - [ ] `HOWTORUN.md`
-- [ ] `docs/screenshots/` (5 screenshots)
-- [ ] **PR description** includes screenshots for every step
+- [ ] `docs/presentation.pdf`
+- [ ] `docs/screenshots/` (6 screenshots)
+- [ ] **PR description** includes screenshots, presentation PDF, and links for every step
 
 ---
 
@@ -303,25 +323,28 @@ Use this to self-check before submitting:
 
 | Criterion | Check |
 |---|---|
-| `specification.md` has all 5 sections and Low-Level Tasks per agent | ✅ / ❌ |
+| `specification.md` has all 5 sections and Low-Level Tasks per pipeline stage | ✅ / ❌ |
 | Skill that generates spec from template is present | ✅ / ❌ |
-| Pipeline runs to completion (e.g. `python integrator.py`) with no errors | ✅ / ❌ |
-| All agents write valid JSON messages to `shared/` directories | ✅ / ❌ |
+| Pipeline runs to completion (e.g. `python orchestrator.py`) with no errors | ✅ / ❌ |
+| All stages write valid JSON records to `shared/` directories | ✅ / ❌ |
+| Simple front-end runs and shows pipeline output or status | ✅ / ❌ |
 | `/run-pipeline` skill executes the pipeline via AI | ✅ / ❌ |
 | Coverage gate hook is configured and blocks push if coverage < 80% | ✅ / ❌ |
 | `mcp.json` has context7 and custom MCP; both respond | ✅ / ❌ |
 | Test coverage meets gate (≥ 80%); aim for ≥ 90% | ✅ / ❌ |
 | `README.md` includes **your name** and ASCII pipeline diagram | ✅ / ❌ |
 | `HOWTORUN.md` has numbered steps from setup to demo | ✅ / ❌ |
-| 5 screenshots in `docs/screenshots/` and **in PR description** | ✅ / ❌ |
+| `docs/presentation.pdf` committed and linked in PR description | ✅ / ❌ |
+| 6 screenshots in `docs/screenshots/` and **in PR description** | ✅ / ❌ |
 
 ---
 
 ## Tips for Success
 
 - **Spec first, code second.** Students who skip Task 1 spend twice as long debugging in Task 2.
-- **One agent at a time.** Finish and test one agent before starting the next.
+- **One stage at a time.** Finish and test one pipeline stage before starting the next.
 - **Use context7** to look up library docs for your chosen framework.
 - **Your skills save time.** Once `/run-pipeline` is set up, you can trigger the whole demo in one command.
 - **Screenshot every step and add them to your PR description.** Capture screenshots during development and include them in the PR so reviewers can see each step.
-- **Read the sample transactions.** Understanding the input data shapes every agent decision.
+- **Export your presentation early.** Generate the PDF before the deadline and verify it opens correctly from the PR link.
+- **Read the sample transactions.** Understanding the input data shapes every pipeline decision.
