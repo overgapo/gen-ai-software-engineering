@@ -1,0 +1,14 @@
+[
+  {
+    "customer_email": "dan@example.com",
+    "subject": "App crashes on save",
+    "description": "Steps to reproduce: open a report, click save. The app crashes with an error.",
+    "tags": ["crash"],
+    "metadata": { "source": "email", "device_type": "mobile" }
+  },
+  {
+    "customer_email": "eve@example.com",
+    "subject": "Invoice question",
+    "description": "I was charged twice for my subscription this month."
+  }
+]

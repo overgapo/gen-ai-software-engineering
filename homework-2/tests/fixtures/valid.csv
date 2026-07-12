@@ -1,0 +1,4 @@
+customer_email,subject,description,category,priority,tags,metadata
+alice@example.com,Cannot login,"My password is rejected, I cannot access my account.",,,"[""auth"",""login""]","{""source"":""web_form"",""device_type"":""desktop"",""browser"":""Chrome""}"
+bob@example.com,Refund request,Please refund my duplicate charge from June invoice.,billing_question,high,,
+carol@example.com,Feature idea,Please add dark mode to the dashboard settings page.,,,"[""ui""]",

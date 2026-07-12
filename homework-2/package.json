@@ -1,0 +1,29 @@
+{
+  "name": "customer-support-system",
+  "version": "1.0.0",
+  "description": "Intelligent customer support ticket management system (Homework 2)",
+  "type": "commonjs",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "test:ui": "jest --config jest.ui.config.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "csv-parse": "^5.5.6",
+    "express": "^4.19.2",
+    "fast-xml-parser": "^4.4.0",
+    "multer": "^1.4.5-lts.1"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "puppeteer-core": "^24.43.1",
+    "supertest": "^7.0.0"
+  }
+}

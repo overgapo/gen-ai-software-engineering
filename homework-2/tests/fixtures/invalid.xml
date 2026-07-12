@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tickets>
+  <ticket>
+    <customer_email>frank@example.com</customer_email>
+    <subject>Password reset loop</subject>
+    <description>The password reset link sends me back to the login page.</description>
+  </ticket>
+  <ticket>
+    <customer_email>broken-email</customer_email>
+    <subject>Missing description</subject>
+    <description>short</description>
+  </ticket>
+</tickets>
