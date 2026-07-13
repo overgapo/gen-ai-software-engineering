@@ -1,7 +1,6 @@
 # 🎧 Homework 2: Intelligent Customer Support System
 
-> **Student Name**: ash ([@overgapo](https://github.com/overgapo))
-> **Date Submitted**: 2026-07-12
+> **Student Name**: Andrii Shukailo ([@overgapo](https://github.com/overgapo))
 > **AI Tools Used**: Claude Code (Fable 5) — spec analysis, implementation, tests, docs
 
 ---
