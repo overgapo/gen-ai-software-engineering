@@ -421,7 +421,7 @@ Each task names the objective it serves (**traceability**), the prompt that woul
 - A truncated accrual carries both the granted amount and a `CAP_*` reason.
 
 #### T10 — `card.cleared` → confirm / amend the accrual
-**Serves:** M2, M1
+**Serves:** M1, M2, M3
 **Prompt:** "On clearing, confirm the pending accrual, amending it if the cleared amount differs; write the ledger entry."
 **File:** `src/ingest/cleared.consumer.ts`
 **Details:** Cleared > authorized (tip) → adjust up; cleared < authorized → adjust down (E2, E3). Amendment adjusts the **existing** accrual row and writes **one** `ACCRUAL` ledger entry for the final amount. Cap counters are adjusted by the delta, atomically.
@@ -575,12 +575,15 @@ Each task names the objective it serves (**traceability**), the prompt that woul
 | **M1** Earn, once, with a reason | T1, T2, T3, T7, T8, T10, T12, T21 |
 | **M2** Two-stage visibility | T6, T10, T11 |
 | **M3** Caps without races | T9, T10 |
-| **M4** Clawback | T13, T14, T15 |
-| **M5** Payout | T16, T17, T18 |
+| **M4** Clawback | T2, T13, T14, T15 |
+| **M5** Payout | T2, T16, T17, T18 |
 | **M6** Rule versioning | T4, T5 |
-| **M7** Audit, adjustment, explainability | T5, T21, T22, T23, T24 |
+| **M7** Audit, adjustment, explainability | T2, T5, T21, T22, T23, T24 |
 | **M8** Abuse controls | T14, T19, T20 |
-| **M9** Finance reconciliation | T12, T25, T26 |
-| **Non-functional** (§5) | T27, T28 |
+| **M9** Finance reconciliation | T2, T12, T18, T25, T26 |
+| **Non-functional** (§5) | T1 (§5.3), T23 (§5.5), T24 (§5.6), T27 (§5.1) |
+| **All objectives** | T28 — fixtures underpin the verification of M1–M9, so it is listed once here rather than repeated in every row |
 
 Every task traces to at least one objective; every objective is served by at least two tasks. A task that cannot name its objective does not belong in this spec.
+
+**This matrix is generated from the `Serves:` line of each task in §9 — it does not restate them.** If the two ever disagree, the task is right and the matrix is stale: the matrix is a view, not a second source of truth. Any task added to §9 without a `Serves:` line is incomplete and must not be implemented.
