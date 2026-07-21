@@ -1,0 +1,308 @@
+[
+  {
+    "customer_id": "CUST-1050",
+    "customer_email": "alice.johnson50@example.com",
+    "customer_name": "Alice Johnson",
+    "subject": "Dashboard crashes on load",
+    "description": "The analytics dashboard crashes with an error each time it loads. It worked fine last week.",
+    "tags": [
+      "crash"
+    ],
+    "metadata": {
+      "source": "web_form",
+      "device_type": "desktop",
+      "browser": "Safari"
+    }
+  },
+  {
+    "customer_id": "CUST-1051",
+    "customer_email": "bohdan.kovalenko51@example.com",
+    "customer_name": "Bohdan Kovalenko",
+    "subject": "Export fails with reproduction steps",
+    "description": "Steps to reproduce: 1. open the monthly report 2. click export. Expected: a PDF downloads. Actual: an error page appears.",
+    "tags": [
+      "export",
+      "bug"
+    ],
+    "metadata": {
+      "source": "api",
+      "device_type": "desktop",
+      "browser": "Chrome"
+    }
+  },
+  {
+    "customer_id": "CUST-1052",
+    "customer_email": "carol.smith52@example.com",
+    "customer_name": "Carol Smith",
+    "subject": "Charged twice this month",
+    "description": "My invoice shows a duplicate payment. Please issue a refund for the second charge asap, this is important.",
+    "tags": [
+      "billing"
+    ],
+    "metadata": {
+      "source": "email",
+      "device_type": "mobile",
+      "browser": "Firefox"
+    }
+  },
+  {
+    "customer_id": "CUST-1053",
+    "customer_email": "dmytro.bondar53@example.com",
+    "customer_name": "Dmytro Bondar",
+    "subject": "Question about subscription price",
+    "description": "Could you explain the price difference between the annual and monthly subscription on my invoice?",
+    "tags": [
+      "billing"
+    ],
+    "metadata": {
+      "source": "chat",
+      "device_type": "tablet",
+      "browser": "Safari"
+    }
+  },
+  {
+    "customer_id": "CUST-1054",
+    "customer_email": "emma.wilson54@example.com",
+    "customer_name": "Emma Wilson",
+    "subject": "Please add dark mode",
+    "description": "It would be great if you could please add a dark theme. Just a suggestion, purely cosmetic.",
+    "tags": [
+      "ui",
+      "idea"
+    ],
+    "metadata": {
+      "source": "web_form",
+      "device_type": "mobile",
+      "browser": "Chrome"
+    }
+  },
+  {
+    "customer_id": "CUST-1055",
+    "customer_email": "frank.miller55@example.com",
+    "customer_name": "Frank Miller",
+    "subject": "Feature: export to Excel",
+    "description": "Please add an enhancement to export reports directly to Excel. This would improve our workflow a lot.",
+    "tags": [
+      "export",
+      "idea"
+    ],
+    "metadata": {
+      "source": "chat",
+      "device_type": "desktop",
+      "browser": "Firefox"
+    }
+  },
+  {
+    "customer_id": "CUST-1056",
+    "customer_email": "halyna.tkachenko56@example.com",
+    "customer_name": "Halyna Tkachenko",
+    "subject": "Production down after update",
+    "description": "Production down since the last update, every request fails with an error. Critical, our whole team is blocked.",
+    "tags": [
+      "outage"
+    ],
+    "metadata": {
+      "source": "phone",
+      "device_type": "desktop",
+      "browser": "Safari"
+    }
+  },
+  {
+    "customer_id": "CUST-1057",
+    "customer_email": "ivan.petrov57@example.com",
+    "customer_name": "Ivan Petrov",
+    "subject": "Minor typo on the welcome page",
+    "description": "There is a minor cosmetic typo in the greeting banner on the welcome page. Not urgent at all.",
+    "tags": [
+      "ui"
+    ],
+    "metadata": {
+      "source": "web_form",
+      "device_type": "tablet",
+      "browser": "Chrome"
+    }
+  },
+  {
+    "customer_id": "CUST-1058",
+    "customer_email": "julia.brown58@example.com",
+    "customer_name": "Julia Brown",
+    "subject": "How do I invite teammates?",
+    "description": "I could not find where to invite my teammates to the workspace. Where is that option located?",
+    "tags": [],
+    "metadata": {
+      "source": "chat",
+      "device_type": "mobile",
+      "browser": "Firefox"
+    }
+  },
+  {
+    "customer_id": "CUST-1059",
+    "customer_email": "kateryna.shevchenko59@example.com",
+    "customer_name": "Kateryna Shevchenko",
+    "subject": "Security concern with shared links",
+    "description": "Shared links seem to be readable without a login. This looks like a security problem, please verify.",
+    "tags": [
+      "security"
+    ],
+    "metadata": {
+      "source": "email",
+      "device_type": "desktop",
+      "browser": "Safari"
+    }
+  },
+  {
+    "customer_id": "CUST-1060",
+    "customer_email": "alice.johnson60@example.com",
+    "customer_name": "Alice Johnson",
+    "subject": "Cannot log into my account",
+    "description": "My password is rejected every time and I cannot access my account. This is critical for my work.",
+    "tags": [
+      "auth",
+      "login"
+    ],
+    "metadata": {
+      "source": "web_form",
+      "device_type": "desktop",
+      "browser": "Chrome"
+    }
+  },
+  {
+    "customer_id": "CUST-1061",
+    "customer_email": "bohdan.kovalenko61@example.com",
+    "customer_name": "Bohdan Kovalenko",
+    "subject": "2FA code never arrives",
+    "description": "The two-factor authentication SMS never arrives, so I am locked out of the login page.",
+    "tags": [
+      "auth",
+      "2fa"
+    ],
+    "metadata": {
+      "source": "email",
+      "device_type": "mobile",
+      "browser": "Firefox"
+    }
+  },
+  {
+    "customer_id": "CUST-1062",
+    "customer_email": "carol.smith62@example.com",
+    "customer_name": "Carol Smith",
+    "subject": "Dashboard crashes on load",
+    "description": "The analytics dashboard crashes with an error each time it loads. It worked fine last week.",
+    "tags": [
+      "crash"
+    ],
+    "metadata": {
+      "source": "web_form",
+      "device_type": "desktop",
+      "browser": "Safari"
+    }
+  },
+  {
+    "customer_id": "CUST-1063",
+    "customer_email": "dmytro.bondar63@example.com",
+    "customer_name": "Dmytro Bondar",
+    "subject": "Export fails with reproduction steps",
+    "description": "Steps to reproduce: 1. open the monthly report 2. click export. Expected: a PDF downloads. Actual: an error page appears.",
+    "tags": [
+      "export",
+      "bug"
+    ],
+    "metadata": {
+      "source": "api",
+      "device_type": "desktop",
+      "browser": "Chrome"
+    }
+  },
+  {
+    "customer_id": "CUST-1064",
+    "customer_email": "emma.wilson64@example.com",
+    "customer_name": "Emma Wilson",
+    "subject": "Charged twice this month",
+    "description": "My invoice shows a duplicate payment. Please issue a refund for the second charge asap, this is important.",
+    "tags": [
+      "billing"
+    ],
+    "metadata": {
+      "source": "email",
+      "device_type": "mobile",
+      "browser": "Firefox"
+    }
+  },
+  {
+    "customer_id": "CUST-1065",
+    "customer_email": "frank.miller65@example.com",
+    "customer_name": "Frank Miller",
+    "subject": "Question about subscription price",
+    "description": "Could you explain the price difference between the annual and monthly subscription on my invoice?",
+    "tags": [
+      "billing"
+    ],
+    "metadata": {
+      "source": "chat",
+      "device_type": "tablet",
+      "browser": "Safari"
+    }
+  },
+  {
+    "customer_id": "CUST-1066",
+    "customer_email": "halyna.tkachenko66@example.com",
+    "customer_name": "Halyna Tkachenko",
+    "subject": "Please add dark mode",
+    "description": "It would be great if you could please add a dark theme. Just a suggestion, purely cosmetic.",
+    "tags": [
+      "ui",
+      "idea"
+    ],
+    "metadata": {
+      "source": "web_form",
+      "device_type": "mobile",
+      "browser": "Chrome"
+    }
+  },
+  {
+    "customer_id": "CUST-1067",
+    "customer_email": "ivan.petrov67@example.com",
+    "customer_name": "Ivan Petrov",
+    "subject": "Feature: export to Excel",
+    "description": "Please add an enhancement to export reports directly to Excel. This would improve our workflow a lot.",
+    "tags": [
+      "export",
+      "idea"
+    ],
+    "metadata": {
+      "source": "chat",
+      "device_type": "desktop",
+      "browser": "Firefox"
+    }
+  },
+  {
+    "customer_id": "CUST-1068",
+    "customer_email": "julia.brown68@example.com",
+    "customer_name": "Julia Brown",
+    "subject": "Production down after update",
+    "description": "Production down since the last update, every request fails with an error. Critical, our whole team is blocked.",
+    "tags": [
+      "outage"
+    ],
+    "metadata": {
+      "source": "phone",
+      "device_type": "desktop",
+      "browser": "Safari"
+    }
+  },
+  {
+    "customer_id": "CUST-1069",
+    "customer_email": "kateryna.shevchenko69@example.com",
+    "customer_name": "Kateryna Shevchenko",
+    "subject": "Minor typo on the welcome page",
+    "description": "There is a minor cosmetic typo in the greeting banner on the welcome page. Not urgent at all.",
+    "tags": [
+      "ui"
+    ],
+    "metadata": {
+      "source": "web_form",
+      "device_type": "tablet",
+      "browser": "Chrome"
+    }
+  }
+]

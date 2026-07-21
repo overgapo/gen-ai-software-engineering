@@ -1,0 +1,4 @@
+customer_id,customer_email,customer_name,subject,description,tags,metadata
+CUST-1003,dmytro.bondar3@example.com,Dmytro Bondar,Export fails with reproduction steps,Steps to reproduce: 1. open the monthly report 2. click export. Expected: a PDF downloads. Actual: an error page appears.,"[""export"",""bug""]","{""source"":""api"",""device_type"":""desktop"",""browser"":""Chrome""}"
+CUST-1000,not-an-email,Alice Johnson,Cannot log into my account,My password is rejected every time and I cannot access my account. This is critical for my work.,"[""auth"",""login""]","{""source"":""web_form"",""device_type"":""desktop"",""browser"":""Chrome""}"
+CUST-1002,carol.smith2@example.com,Carol Smith,Dashboard crashes on load,too short,"[""crash""]","{""source"":""web_form"",""device_type"":""desktop"",""browser"":""Safari""}"

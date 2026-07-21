@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tickets>
+  <ticket>
+    <customer_id>CUST-1006</customer_id>
+    <customer_email>halyna.tkachenko6@example.com</customer_email>
+    <customer_name>Halyna Tkachenko</customer_name>
+    <subject>Please add dark mode</subject>
+    <description>It would be great if you could please add a dark theme. Just a suggestion, purely cosmetic.</description>
+    <tags>
+      <tag>ui</tag>
+      <tag>idea</tag>
+    </tags>
+    <metadata>
+      <source>web_form</source>
+      <device_type>mobile</device_type>
+      <browser>Chrome</browser>
+    </metadata>
+  </ticket>
+  <ticket>
+    <customer_id>CUST-1000</customer_id>
+    <customer_email>not-an-email</customer_email>
+    <customer_name>Alice Johnson</customer_name>
+    <subject>Cannot log into my account</subject>
+    <description>My password is rejected every time and I cannot access my account. This is critical for my work.</description>
+    <tags>
+      <tag>auth</tag>
+      <tag>login</tag>
+    </tags>
+    <metadata>
+      <source>web_form</source>
+      <device_type>desktop</device_type>
+      <browser>Chrome</browser>
+    </metadata>
+  </ticket>
+  <ticket>
+    <customer_id>CUST-1002</customer_id>
+    <customer_email>carol.smith2@example.com</customer_email>
+    <customer_name>Carol Smith</customer_name>
+    <subject>Dashboard crashes on load</subject>
+    <description>too short</description>
+    <tags>
+      <tag>crash</tag>
+    </tags>
+    <metadata>
+      <source>web_form</source>
+      <device_type>desktop</device_type>
+      <browser>Safari</browser>
+    </metadata>
+  </ticket>
+</tickets>

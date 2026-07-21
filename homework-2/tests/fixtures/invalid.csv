@@ -1,0 +1,4 @@
+customer_email,subject,description,category,priority,tags,metadata
+alice@example.com,Cannot login,"My password is rejected, I cannot access my account.",,,,
+not-an-email,Broken record,short,unknown_category,,,
+carol@example.com,Feature idea,Please add dark mode to the dashboard settings page.,,,,

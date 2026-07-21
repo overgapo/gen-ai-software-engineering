@@ -1,0 +1,466 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tickets>
+  <ticket>
+    <customer_id>CUST-1070</customer_id>
+    <customer_email>alice.johnson70@example.com</customer_email>
+    <customer_name>Alice Johnson</customer_name>
+    <subject>How do I invite teammates?</subject>
+    <description>I could not find where to invite my teammates to the workspace. Where is that option located?</description>
+    <tags>
+      
+    </tags>
+    <metadata>
+      <source>chat</source>
+      <device_type>mobile</device_type>
+      <browser>Firefox</browser>
+    </metadata>
+  </ticket>
+  <ticket>
+    <customer_id>CUST-1071</customer_id>
+    <customer_email>bohdan.kovalenko71@example.com</customer_email>
+    <customer_name>Bohdan Kovalenko</customer_name>
+    <subject>Security concern with shared links</subject>
+    <description>Shared links seem to be readable without a login. This looks like a security problem, please verify.</description>
+    <tags>
+      <tag>security</tag>
+    </tags>
+    <metadata>
+      <source>email</source>
+      <device_type>desktop</device_type>
+      <browser>Safari</browser>
+    </metadata>
+  </ticket>
+  <ticket>
+    <customer_id>CUST-1072</customer_id>
+    <customer_email>carol.smith72@example.com</customer_email>
+    <customer_name>Carol Smith</customer_name>
+    <subject>Cannot log into my account</subject>
+    <description>My password is rejected every time and I cannot access my account. This is critical for my work.</description>
+    <tags>
+      <tag>auth</tag>
+      <tag>login</tag>
+    </tags>
+    <metadata>
+      <source>web_form</source>
+      <device_type>desktop</device_type>
+      <browser>Chrome</browser>
+    </metadata>
+  </ticket>
+  <ticket>
+    <customer_id>CUST-1073</customer_id>
+    <customer_email>dmytro.bondar73@example.com</customer_email>
+    <customer_name>Dmytro Bondar</customer_name>
+    <subject>2FA code never arrives</subject>
+    <description>The two-factor authentication SMS never arrives, so I am locked out of the login page.</description>
+    <tags>
+      <tag>auth</tag>
+      <tag>2fa</tag>
+    </tags>
+    <metadata>
+      <source>email</source>
+      <device_type>mobile</device_type>
+      <browser>Firefox</browser>
+    </metadata>
+  </ticket>
+  <ticket>
+    <customer_id>CUST-1074</customer_id>
+    <customer_email>emma.wilson74@example.com</customer_email>
+    <customer_name>Emma Wilson</customer_name>
+    <subject>Dashboard crashes on load</subject>
+    <description>The analytics dashboard crashes with an error each time it loads. It worked fine last week.</description>
+    <tags>
+      <tag>crash</tag>
+    </tags>
+    <metadata>
+      <source>web_form</source>
+      <device_type>desktop</device_type>
+      <browser>Safari</browser>
+    </metadata>
+  </ticket>
+  <ticket>
+    <customer_id>CUST-1075</customer_id>
+    <customer_email>frank.miller75@example.com</customer_email>
+    <customer_name>Frank Miller</customer_name>
+    <subject>Export fails with reproduction steps</subject>
+    <description>Steps to reproduce: 1. open the monthly report 2. click export. Expected: a PDF downloads. Actual: an error page appears.</description>
+    <tags>
+      <tag>export</tag>
+      <tag>bug</tag>
+    </tags>
+    <metadata>
+      <source>api</source>
+      <device_type>desktop</device_type>
+      <browser>Chrome</browser>
+    </metadata>
+  </ticket>
+  <ticket>
+    <customer_id>CUST-1076</customer_id>
+    <customer_email>halyna.tkachenko76@example.com</customer_email>
+    <customer_name>Halyna Tkachenko</customer_name>
+    <subject>Charged twice this month</subject>
+    <description>My invoice shows a duplicate payment. Please issue a refund for the second charge asap, this is important.</description>
+    <tags>
+      <tag>billing</tag>
+    </tags>
+    <metadata>
+      <source>email</source>
+      <device_type>mobile</device_type>
+      <browser>Firefox</browser>
+    </metadata>
+  </ticket>
+  <ticket>
+    <customer_id>CUST-1077</customer_id>
+    <customer_email>ivan.petrov77@example.com</customer_email>
+    <customer_name>Ivan Petrov</customer_name>
+    <subject>Question about subscription price</subject>
+    <description>Could you explain the price difference between the annual and monthly subscription on my invoice?</description>
+    <tags>
+      <tag>billing</tag>
+    </tags>
+    <metadata>
+      <source>chat</source>
+      <device_type>tablet</device_type>
+      <browser>Safari</browser>
+    </metadata>
+  </ticket>
+  <ticket>
+    <customer_id>CUST-1078</customer_id>
+    <customer_email>julia.brown78@example.com</customer_email>
+    <customer_name>Julia Brown</customer_name>
+    <subject>Please add dark mode</subject>
+    <description>It would be great if you could please add a dark theme. Just a suggestion, purely cosmetic.</description>
+    <tags>
+      <tag>ui</tag>
+      <tag>idea</tag>
+    </tags>
+    <metadata>
+      <source>web_form</source>
+      <device_type>mobile</device_type>
+      <browser>Chrome</browser>
+    </metadata>
+  </ticket>
+  <ticket>
+    <customer_id>CUST-1079</customer_id>
+    <customer_email>kateryna.shevchenko79@example.com</customer_email>
+    <customer_name>Kateryna Shevchenko</customer_name>
+    <subject>Feature: export to Excel</subject>
+    <description>Please add an enhancement to export reports directly to Excel. This would improve our workflow a lot.</description>
+    <tags>
+      <tag>export</tag>
+      <tag>idea</tag>
+    </tags>
+    <metadata>
+      <source>chat</source>
+      <device_type>desktop</device_type>
+      <browser>Firefox</browser>
+    </metadata>
+  </ticket>
+  <ticket>
+    <customer_id>CUST-1080</customer_id>
+    <customer_email>alice.johnson80@example.com</customer_email>
+    <customer_name>Alice Johnson</customer_name>
+    <subject>Production down after update</subject>
+    <description>Production down since the last update, every request fails with an error. Critical, our whole team is blocked.</description>
+    <tags>
+      <tag>outage</tag>
+    </tags>
+    <metadata>
+      <source>phone</source>
+      <device_type>desktop</device_type>
+      <browser>Safari</browser>
+    </metadata>
+  </ticket>
+  <ticket>
+    <customer_id>CUST-1081</customer_id>
+    <customer_email>bohdan.kovalenko81@example.com</customer_email>
+    <customer_name>Bohdan Kovalenko</customer_name>
+    <subject>Minor typo on the welcome page</subject>
+    <description>There is a minor cosmetic typo in the greeting banner on the welcome page. Not urgent at all.</description>
+    <tags>
+      <tag>ui</tag>
+    </tags>
+    <metadata>
+      <source>web_form</source>
+      <device_type>tablet</device_type>
+      <browser>Chrome</browser>
+    </metadata>
+  </ticket>
+  <ticket>
+    <customer_id>CUST-1082</customer_id>
+    <customer_email>carol.smith82@example.com</customer_email>
+    <customer_name>Carol Smith</customer_name>
+    <subject>How do I invite teammates?</subject>
+    <description>I could not find where to invite my teammates to the workspace. Where is that option located?</description>
+    <tags>
+      
+    </tags>
+    <metadata>
+      <source>chat</source>
+      <device_type>mobile</device_type>
+      <browser>Firefox</browser>
+    </metadata>
+  </ticket>
+  <ticket>
+    <customer_id>CUST-1083</customer_id>
+    <customer_email>dmytro.bondar83@example.com</customer_email>
+    <customer_name>Dmytro Bondar</customer_name>
+    <subject>Security concern with shared links</subject>
+    <description>Shared links seem to be readable without a login. This looks like a security problem, please verify.</description>
+    <tags>
+      <tag>security</tag>
+    </tags>
+    <metadata>
+      <source>email</source>
+      <device_type>desktop</device_type>
+      <browser>Safari</browser>
+    </metadata>
+  </ticket>
+  <ticket>
+    <customer_id>CUST-1084</customer_id>
+    <customer_email>emma.wilson84@example.com</customer_email>
+    <customer_name>Emma Wilson</customer_name>
+    <subject>Cannot log into my account</subject>
+    <description>My password is rejected every time and I cannot access my account. This is critical for my work.</description>
+    <tags>
+      <tag>auth</tag>
+      <tag>login</tag>
+    </tags>
+    <metadata>
+      <source>web_form</source>
+      <device_type>desktop</device_type>
+      <browser>Chrome</browser>
+    </metadata>
+  </ticket>
+  <ticket>
+    <customer_id>CUST-1085</customer_id>
+    <customer_email>frank.miller85@example.com</customer_email>
+    <customer_name>Frank Miller</customer_name>
+    <subject>2FA code never arrives</subject>
+    <description>The two-factor authentication SMS never arrives, so I am locked out of the login page.</description>
+    <tags>
+      <tag>auth</tag>
+      <tag>2fa</tag>
+    </tags>
+    <metadata>
+      <source>email</source>
+      <device_type>mobile</device_type>
+      <browser>Firefox</browser>
+    </metadata>
+  </ticket>
+  <ticket>
+    <customer_id>CUST-1086</customer_id>
+    <customer_email>halyna.tkachenko86@example.com</customer_email>
+    <customer_name>Halyna Tkachenko</customer_name>
+    <subject>Dashboard crashes on load</subject>
+    <description>The analytics dashboard crashes with an error each time it loads. It worked fine last week.</description>
+    <tags>
+      <tag>crash</tag>
+    </tags>
+    <metadata>
+      <source>web_form</source>
+      <device_type>desktop</device_type>
+      <browser>Safari</browser>
+    </metadata>
+  </ticket>
+  <ticket>
+    <customer_id>CUST-1087</customer_id>
+    <customer_email>ivan.petrov87@example.com</customer_email>
+    <customer_name>Ivan Petrov</customer_name>
+    <subject>Export fails with reproduction steps</subject>
+    <description>Steps to reproduce: 1. open the monthly report 2. click export. Expected: a PDF downloads. Actual: an error page appears.</description>
+    <tags>
+      <tag>export</tag>
+      <tag>bug</tag>
+    </tags>
+    <metadata>
+      <source>api</source>
+      <device_type>desktop</device_type>
+      <browser>Chrome</browser>
+    </metadata>
+  </ticket>
+  <ticket>
+    <customer_id>CUST-1088</customer_id>
+    <customer_email>julia.brown88@example.com</customer_email>
+    <customer_name>Julia Brown</customer_name>
+    <subject>Charged twice this month</subject>
+    <description>My invoice shows a duplicate payment. Please issue a refund for the second charge asap, this is important.</description>
+    <tags>
+      <tag>billing</tag>
+    </tags>
+    <metadata>
+      <source>email</source>
+      <device_type>mobile</device_type>
+      <browser>Firefox</browser>
+    </metadata>
+  </ticket>
+  <ticket>
+    <customer_id>CUST-1089</customer_id>
+    <customer_email>kateryna.shevchenko89@example.com</customer_email>
+    <customer_name>Kateryna Shevchenko</customer_name>
+    <subject>Question about subscription price</subject>
+    <description>Could you explain the price difference between the annual and monthly subscription on my invoice?</description>
+    <tags>
+      <tag>billing</tag>
+    </tags>
+    <metadata>
+      <source>chat</source>
+      <device_type>tablet</device_type>
+      <browser>Safari</browser>
+    </metadata>
+  </ticket>
+  <ticket>
+    <customer_id>CUST-1090</customer_id>
+    <customer_email>alice.johnson90@example.com</customer_email>
+    <customer_name>Alice Johnson</customer_name>
+    <subject>Please add dark mode</subject>
+    <description>It would be great if you could please add a dark theme. Just a suggestion, purely cosmetic.</description>
+    <tags>
+      <tag>ui</tag>
+      <tag>idea</tag>
+    </tags>
+    <metadata>
+      <source>web_form</source>
+      <device_type>mobile</device_type>
+      <browser>Chrome</browser>
+    </metadata>
+  </ticket>
+  <ticket>
+    <customer_id>CUST-1091</customer_id>
+    <customer_email>bohdan.kovalenko91@example.com</customer_email>
+    <customer_name>Bohdan Kovalenko</customer_name>
+    <subject>Feature: export to Excel</subject>
+    <description>Please add an enhancement to export reports directly to Excel. This would improve our workflow a lot.</description>
+    <tags>
+      <tag>export</tag>
+      <tag>idea</tag>
+    </tags>
+    <metadata>
+      <source>chat</source>
+      <device_type>desktop</device_type>
+      <browser>Firefox</browser>
+    </metadata>
+  </ticket>
+  <ticket>
+    <customer_id>CUST-1092</customer_id>
+    <customer_email>carol.smith92@example.com</customer_email>
+    <customer_name>Carol Smith</customer_name>
+    <subject>Production down after update</subject>
+    <description>Production down since the last update, every request fails with an error. Critical, our whole team is blocked.</description>
+    <tags>
+      <tag>outage</tag>
+    </tags>
+    <metadata>
+      <source>phone</source>
+      <device_type>desktop</device_type>
+      <browser>Safari</browser>
+    </metadata>
+  </ticket>
+  <ticket>
+    <customer_id>CUST-1093</customer_id>
+    <customer_email>dmytro.bondar93@example.com</customer_email>
+    <customer_name>Dmytro Bondar</customer_name>
+    <subject>Minor typo on the welcome page</subject>
+    <description>There is a minor cosmetic typo in the greeting banner on the welcome page. Not urgent at all.</description>
+    <tags>
+      <tag>ui</tag>
+    </tags>
+    <metadata>
+      <source>web_form</source>
+      <device_type>tablet</device_type>
+      <browser>Chrome</browser>
+    </metadata>
+  </ticket>
+  <ticket>
+    <customer_id>CUST-1094</customer_id>
+    <customer_email>emma.wilson94@example.com</customer_email>
+    <customer_name>Emma Wilson</customer_name>
+    <subject>How do I invite teammates?</subject>
+    <description>I could not find where to invite my teammates to the workspace. Where is that option located?</description>
+    <tags>
+      
+    </tags>
+    <metadata>
+      <source>chat</source>
+      <device_type>mobile</device_type>
+      <browser>Firefox</browser>
+    </metadata>
+  </ticket>
+  <ticket>
+    <customer_id>CUST-1095</customer_id>
+    <customer_email>frank.miller95@example.com</customer_email>
+    <customer_name>Frank Miller</customer_name>
+    <subject>Security concern with shared links</subject>
+    <description>Shared links seem to be readable without a login. This looks like a security problem, please verify.</description>
+    <tags>
+      <tag>security</tag>
+    </tags>
+    <metadata>
+      <source>email</source>
+      <device_type>desktop</device_type>
+      <browser>Safari</browser>
+    </metadata>
+  </ticket>
+  <ticket>
+    <customer_id>CUST-1096</customer_id>
+    <customer_email>halyna.tkachenko96@example.com</customer_email>
+    <customer_name>Halyna Tkachenko</customer_name>
+    <subject>Cannot log into my account</subject>
+    <description>My password is rejected every time and I cannot access my account. This is critical for my work.</description>
+    <tags>
+      <tag>auth</tag>
+      <tag>login</tag>
+    </tags>
+    <metadata>
+      <source>web_form</source>
+      <device_type>desktop</device_type>
+      <browser>Chrome</browser>
+    </metadata>
+  </ticket>
+  <ticket>
+    <customer_id>CUST-1097</customer_id>
+    <customer_email>ivan.petrov97@example.com</customer_email>
+    <customer_name>Ivan Petrov</customer_name>
+    <subject>2FA code never arrives</subject>
+    <description>The two-factor authentication SMS never arrives, so I am locked out of the login page.</description>
+    <tags>
+      <tag>auth</tag>
+      <tag>2fa</tag>
+    </tags>
+    <metadata>
+      <source>email</source>
+      <device_type>mobile</device_type>
+      <browser>Firefox</browser>
+    </metadata>
+  </ticket>
+  <ticket>
+    <customer_id>CUST-1098</customer_id>
+    <customer_email>julia.brown98@example.com</customer_email>
+    <customer_name>Julia Brown</customer_name>
+    <subject>Dashboard crashes on load</subject>
+    <description>The analytics dashboard crashes with an error each time it loads. It worked fine last week.</description>
+    <tags>
+      <tag>crash</tag>
+    </tags>
+    <metadata>
+      <source>web_form</source>
+      <device_type>desktop</device_type>
+      <browser>Safari</browser>
+    </metadata>
+  </ticket>
+  <ticket>
+    <customer_id>CUST-1099</customer_id>
+    <customer_email>kateryna.shevchenko99@example.com</customer_email>
+    <customer_name>Kateryna Shevchenko</customer_name>
+    <subject>Export fails with reproduction steps</subject>
+    <description>Steps to reproduce: 1. open the monthly report 2. click export. Expected: a PDF downloads. Actual: an error page appears.</description>
+    <tags>
+      <tag>export</tag>
+      <tag>bug</tag>
+    </tags>
+    <metadata>
+      <source>api</source>
+      <device_type>desktop</device_type>
+      <browser>Chrome</browser>
+    </metadata>
+  </ticket>
+</tickets>

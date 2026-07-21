@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tickets>
+  <ticket>
+    <customer_email>frank@example.com</customer_email>
+    <subject>Password reset loop</subject>
+    <description>The password reset link sends me back to the login page.</description>
+    <tags>
+      <tag>auth</tag>
+      <tag>loop</tag>
+    </tags>
+    <metadata>
+      <source>web_form</source>
+      <device_type>tablet</device_type>
+      <browser>Safari</browser>
+    </metadata>
+  </ticket>
+  <ticket>
+    <customer_email>grace@example.com</customer_email>
+    <subject>Export is slow</subject>
+    <description>Exporting a monthly report takes more than five minutes.</description>
+  </ticket>
+</tickets>

@@ -1,0 +1,94 @@
+# Sample requests for the Customer Support API (VS Code REST Client / IntelliJ format).
+# Start the server first: npm start (or ./demo/run.sh)
+
+@base = http://localhost:3000
+
+### Health check
+GET {{base}}/health
+
+### Create a ticket (defaults applied)
+POST {{base}}/tickets
+Content-Type: application/json
+
+{
+  "customer_email": "jane@example.com",
+  "subject": "Cannot log in",
+  "description": "My password is rejected and I cannot access my account."
+}
+
+### Create a ticket with auto-classification
+POST {{base}}/tickets?auto_classify=true
+Content-Type: application/json
+
+{
+  "customer_email": "ops@example.com",
+  "subject": "Production down",
+  "description": "Every request fails with an error since the update. Critical!"
+}
+
+### Validation failure (400 with per-field details)
+POST {{base}}/tickets
+Content-Type: application/json
+
+{
+  "customer_email": "not-an-email",
+  "subject": "",
+  "description": "short"
+}
+
+### List all tickets
+GET {{base}}/tickets
+
+### Combined filtering
+GET {{base}}/tickets?category=account_access&priority=urgent&status=new
+
+### Free-text search
+GET {{base}}/tickets?search=refund
+
+### Get one ticket (replace :id)
+GET {{base}}/tickets/REPLACE-WITH-ID
+
+### Partial update
+PUT {{base}}/tickets/REPLACE-WITH-ID
+Content-Type: application/json
+
+{
+  "status": "in_progress",
+  "assigned_to": "agent-7"
+}
+
+### Resolve (server sets resolved_at)
+PUT {{base}}/tickets/REPLACE-WITH-ID
+Content-Type: application/json
+
+{
+  "status": "resolved"
+}
+
+### Auto-classify an existing ticket
+POST {{base}}/tickets/REPLACE-WITH-ID/auto-classify
+
+### Delete a ticket
+DELETE {{base}}/tickets/REPLACE-WITH-ID
+
+### Bulk import CSV (all-or-nothing) with auto-classification
+POST {{base}}/tickets/import?auto_classify=true
+Content-Type: multipart/form-data; boundary=boundary
+
+--boundary
+Content-Disposition: form-data; name="file"; filename="sample_tickets.csv"
+Content-Type: text/csv
+
+< ./sample_tickets.csv
+--boundary--
+
+### Bulk import that fails atomically (nothing is created)
+POST {{base}}/tickets/import
+Content-Type: multipart/form-data; boundary=boundary
+
+--boundary
+Content-Disposition: form-data; name="file"; filename="invalid_tickets.csv"
+Content-Type: text/csv
+
+< ./invalid_tickets.csv
+--boundary--

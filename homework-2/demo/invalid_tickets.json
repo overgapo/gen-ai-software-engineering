@@ -1,0 +1,49 @@
+[
+  {
+    "customer_id": "CUST-1004",
+    "customer_email": "emma.wilson4@example.com",
+    "customer_name": "Emma Wilson",
+    "subject": "Charged twice this month",
+    "description": "My invoice shows a duplicate payment. Please issue a refund for the second charge asap, this is important.",
+    "tags": [
+      "billing"
+    ],
+    "metadata": {
+      "source": "email",
+      "device_type": "mobile",
+      "browser": "Firefox"
+    }
+  },
+  {
+    "customer_id": "CUST-1005",
+    "customer_email": "frank.miller5@example.com",
+    "customer_name": "Frank Miller",
+    "subject": "Question about subscription price",
+    "description": "Could you explain the price difference between the annual and monthly subscription on my invoice?",
+    "tags": [
+      "billing"
+    ],
+    "metadata": {
+      "source": "chat",
+      "device_type": "tablet",
+      "browser": "Safari"
+    },
+    "priority": "someday"
+  },
+  {
+    "customer_id": "CUST-1001",
+    "customer_email": "bohdan.kovalenko1@example.com",
+    "customer_name": "Bohdan Kovalenko",
+    "subject": "",
+    "description": "The two-factor authentication SMS never arrives, so I am locked out of the login page.",
+    "tags": [
+      "auth",
+      "2fa"
+    ],
+    "metadata": {
+      "source": "email",
+      "device_type": "mobile",
+      "browser": "Firefox"
+    }
+  }
+]
