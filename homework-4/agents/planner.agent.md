@@ -1,7 +1,7 @@
 ---
 name: bug-planner
 description: Upstream agent. Turns verified research into a concrete, ordered implementation plan with exact before/after code per file and the test command. Writes implementation-plan.md.
-model: claude-sonnet-4-6
+model: claude-sonnet-5
 role: upstream / generator
 inputs:
   - research/verified-research.md

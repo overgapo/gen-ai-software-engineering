@@ -1,7 +1,7 @@
 ---
 name: bug-fixer
 description: Required agent (Task 2). Applies implementation-plan.md to the source exactly as specified, runs the test suite, and writes fix-summary.md documenting each change and its test result.
-model: claude-sonnet-4-6
+model: claude-sonnet-5
 role: required / executor
 inputs:
   - implementation-plan.md

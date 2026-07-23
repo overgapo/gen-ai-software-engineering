@@ -23,12 +23,12 @@ AGENTS="agents"
 SKILLS="skills"
 
 # --- Model selection per agent (justified in README.md) --------------------------------
-MODEL_RESEARCHER="claude-sonnet-4-6"
+MODEL_RESEARCHER="claude-sonnet-5"
 MODEL_VERIFIER="claude-opus-4-8"
-MODEL_PLANNER="claude-sonnet-4-6"
-MODEL_FIXER="claude-sonnet-4-6"
+MODEL_PLANNER="claude-sonnet-5"
+MODEL_FIXER="claude-sonnet-5"
 MODEL_SECURITY="claude-opus-4-8"
-MODEL_TESTS="claude-sonnet-4-6"
+MODEL_TESTS="claude-sonnet-5"
 
 # --- Preconditions ---------------------------------------------------------------------
 command -v claude >/dev/null 2>&1 || { echo "ERROR: 'claude' CLI not found on PATH." >&2; exit 1; }

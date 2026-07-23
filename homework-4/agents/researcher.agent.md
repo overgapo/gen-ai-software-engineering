@@ -1,7 +1,7 @@
 ---
 name: bug-researcher
 description: Upstream agent. Explores the sample app and the seeded bug-context files, locates each defect in source, and writes codebase-research.md with exact file:line references and snippets.
-model: claude-sonnet-4-6
+model: claude-sonnet-5
 role: upstream / generator
 inputs:
   - context/bugs/*/bug-context.md

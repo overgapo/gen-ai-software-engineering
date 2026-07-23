@@ -77,12 +77,12 @@ wider cost spread.
 
 | Agent | Model | Why this model |
 |-------|-------|----------------|
-| Bug Researcher | `claude-sonnet-4-6` | Breadth-first exploration across the source; needs solid code reading, not the deepest reasoning — Sonnet balances quality and cost. |
+| Bug Researcher | `claude-sonnet-5` | Breadth-first exploration across the source; needs solid code reading, not the deepest reasoning — Sonnet balances quality and cost. |
 | Research Verifier | `claude-opus-4-8` | Independently fact-checks every `file:line` and grades research quality; a wrong "pass" here corrupts everything downstream, so it gets the strongest reasoning. |
-| Bug Planner | `claude-sonnet-4-6` | Designs the concrete before/after fix; the plan is later validated by the Fixer's tests, so Sonnet is sufficient. |
-| Bug Fixer | `claude-sonnet-4-6` | Applies an explicit plan and runs tests — mechanical, but chosen over Haiku for reliable multi-file edits. |
+| Bug Planner | `claude-sonnet-5` | Designs the concrete before/after fix; the plan is later validated by the Fixer's tests, so Sonnet is sufficient. |
+| Bug Fixer | `claude-sonnet-5` | Applies an explicit plan and runs tests — mechanical, but chosen over Haiku for reliable multi-file edits. |
 | Security Verifier | `claude-opus-4-8` | Security judgment and severity rating on the changed code; the brief explicitly calls for stronger reasoning on security review. |
-| Unit Test Generator | `claude-sonnet-4-6` | FIRST tests must cover the boundary case (bug 002); needs real reasoning to write meaningful, non-trivial tests. |
+| Unit Test Generator | `claude-sonnet-5` | FIRST tests must cover the boundary case (bug 002); needs real reasoning to write meaningful, non-trivial tests. |
 
 ---
 

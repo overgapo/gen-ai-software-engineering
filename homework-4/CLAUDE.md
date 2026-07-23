@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 `homework-4` is one assignment in a university course ("GenAI and Agentic AI for Software Engineering"). The parent repo (`../`) is a homework template with one directory per assignment (`homework-1` … `homework-6`); each is self-contained with its own `CLAUDE.md`, so do not carry another assignment's stack or commands into here.
 
-This directory is currently **unimplemented** — the only file is `TASKS.md`, the binding assignment brief. Read it first; everything below summarizes and disambiguates it.
+`TASKS.md` is the binding assignment brief — read it first; everything below summarizes and disambiguates it. The tooling (`agents/`, `skills/`, `run-pipeline.sh`), the deliberately-buggy subject app (`src/`), the seeded-defect docs (`context/bugs/`), and `README.md`/`HOWTORUN.md` are all implemented and committed. What remains is running the pipeline end-to-end and capturing the artifacts + screenshots it produces.
 
 ## The assignment in one sentence
 
@@ -61,12 +61,12 @@ These decisions are locked. If a later step wants to contradict one, say so out 
 
    | Agent | Model | Why |
    |-------|-------|-----|
-   | Bug Researcher | `claude-sonnet-4-6` | Breadth-first code exploration; balanced quality/cost |
+   | Bug Researcher | `claude-sonnet-5` | Breadth-first code exploration; balanced quality/cost |
    | Research Verifier | `claude-opus-4-8` | Independent fact-check + quality grading (Task 1 is graded on this) |
-   | Bug Planner | `claude-sonnet-4-6` | Designs the before/after fix; plan is later validated by the Fixer's tests |
-   | Bug Fixer | `claude-sonnet-4-6` | Applies the plan and runs tests; Sonnet chosen over Haiku for edit reliability |
+   | Bug Planner | `claude-sonnet-5` | Designs the before/after fix; plan is later validated by the Fixer's tests |
+   | Bug Fixer | `claude-sonnet-5` | Applies the plan and runs tests; Sonnet chosen over Haiku for edit reliability |
    | Security Verifier | `claude-opus-4-8` | Security judgment + severity rating; brief calls for stronger reasoning here |
-   | Unit Test Generator | `claude-sonnet-4-6` | FIRST tests must cover the boundary case (Bug #2); needs real reasoning |
+   | Unit Test Generator | `claude-sonnet-5` | FIRST tests must cover the boundary case (Bug #2); needs real reasoning |
 
 ## Note on `TASKS.md`
 

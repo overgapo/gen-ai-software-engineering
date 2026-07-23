@@ -1,7 +1,7 @@
 ---
 name: unit-test-generator
 description: Required agent (Task 4). Generates Jest/supertest unit tests for the changed code following the FIRST skill, runs them, and writes test-report.md. Writes new test files under tests/.
-model: claude-sonnet-4-6
+model: claude-sonnet-5
 role: required / test author
 inputs:
   - fix-summary.md
