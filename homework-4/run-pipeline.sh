@@ -81,11 +81,28 @@ Use your file tools to create the artifact before you finish.
     echo "   (skill loaded: ${skill_file})"
   fi
 
+  # Capture the CLI's status instead of letting `set -e` abort mid-function: a bare failure
+  # would kill the script before the diagnostics below ever print, leaving the operator with
+  # no idea which step died or why. (Seen for real: a mid-stream API stall on step 6.)
+  local status=0
   printf '%s' "$prompt" | claude -p \
     --model "$model" \
     --permission-mode acceptEdits \
     --allowedTools $ALLOWED_TOOLS \
-    --add-dir "$ROOT"
+    --add-dir "$ROOT" || status=$?
+
+  if [ "$status" -ne 0 ]; then
+    echo "" >&2
+    echo "------------------------------------------------------------------------------" >&2
+    echo "✖  ${label} FAILED — the claude CLI exited with status ${status}." >&2
+    echo "   Common causes: a mid-stream API error, or an invalid --model id." >&2
+    if [ -e "$expected" ]; then
+      echo "   NOTE: ${expected} exists anyway — the agent may have written it before" >&2
+      echo "   failing. Inspect it; if it is complete, re-run just this step." >&2
+    fi
+    echo "------------------------------------------------------------------------------" >&2
+    exit 1
+  fi
 
   # Gate: refuse to continue on a step that produced nothing, so a vacuous run can never
   # masquerade as a successful one.

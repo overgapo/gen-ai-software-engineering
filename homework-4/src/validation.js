@@ -25,7 +25,7 @@ function validateExpense(body) {
 }
 
 function hasAtMostTwoDecimals(n) {
-  return Math.round(n * 100) === n * 100;
+  return Math.abs(Math.round(n * 100) - n * 100) < 1e-9;
 }
 
 module.exports = { validateExpense };

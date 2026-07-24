@@ -1,57 +1,282 @@
-# Implementation Plan — Expense Tracker Seeded Defects
+# Implementation Plan — Expense Tracker (`src/`)
 
-## Gate check (per `research/verified-research.md`)
+Derived from `research/verified-research.md`.
 
-**Result: FAIL — Quality Level C (Shaky).** `verified_ratio` = 31/32 (97%), with **1 Material
-discrepancy** (C36) and 0 Critical discrepancies.
+## Gate check
 
-Per the Bug Planner's process, a FAIL gate at Level C or D means: **do not plan fixes from
-this document.** This plan therefore contains a single step — correct the research — and
-stops there. No before/after code changes are authorized in this run.
+- **Verification Summary gate: PASS** (Quality Level A — Verified, `verified_ratio` 36/36,
+  zero Discrepancies).
+- Proceeding to plan all four verified defects directly from
+  `research/codebase-research.md` / `research/verified-research.md`. No claim requires
+  re-research.
 
-## Failing claim
+---
 
-- **C36** — `research/codebase-research.md`, "Notes for the Planner" (first bullet), and its
-  restatement in the References section, asserts:
+## Change 1 — `GET /summary` ignores query filters
 
-  > `validation.js`'s amount/date checks (lines 8–22) are correct as written and do not need
-  > changes.
+- **Target:** `src/expenses.js`, `router.get('/summary', ...)` handler (lines 50-63).
+- **Which defect:** `context/bugs/001` (logic defect).
 
-  This is **false**. `src/validation.js:27-29` (`hasAtMostTwoDecimals`) rejects valid
-  two-decimal amounts (e.g. `8.29`, `0.07`) due to a floating-point round-trip error
-  (`Math.round(n * 100) === n * 100` fails for these inputs). `verified-research.md` confirmed
-  this by execution and classified it as a Material discrepancy — false where it counts,
-  because it scopes downstream work (a Unit Test Generator relying on this claim could write a
-  FIRST test asserting `amount: 8.29` → 201, which fails against unmodified code).
+**Before:**
 
-## Required correction before re-planning
+```js
+router.get('/summary', (req, res) => {
+  // The summary should describe the SAME filtered set a client sees from GET /expenses,
+  // so passing ?category=food here should total only food expenses.
+  //
+  // SEEDED BUG (context/bugs/001): the query filter is ignored — totals are always
+  // computed over every stored expense, so the summary disagrees with the filtered list.
+  const rows = store.all();
+  const total = rows.reduce((sum, e) => sum + e.amount, 0);
+  const byCategory = {};
+  for (const e of rows) {
+    byCategory[e.category] = (byCategory[e.category] || 0) + e.amount;
+  }
+  return res.json({ count: rows.length, total, byCategory });
+});
+```
 
-`research/codebase-research.md` must replace the "correct as written" bullet (and its
-References-section restatement) with:
+**After:**
 
-> `validation.js` contains no **seeded** defect (no `context/bugs/` entry references it), but
-> its two-decimal check (`hasAtMostTwoDecimals`, lines 27–29) has a pre-existing,
-> **unseeded** floating-point flaw that rejects valid amounts such as `8.29` and `0.07`. This
-> is out of scope for the three seeded defects in `context/bugs/001-003` and is not fixed in
-> this run.
+```js
+router.get('/summary', (req, res) => {
+  // Reuse the shared filter so the summary always describes the same set GET /expenses
+  // returns for the same query.
+  const rows = filterExpenses(store.all(), req.query);
+  const total = rows.reduce((sum, e) => sum + e.amount, 0);
+  const byCategory = {};
+  for (const e of rows) {
+    byCategory[e.category] = (byCategory[e.category] || 0) + e.amount;
+  }
+  return res.json({ count: rows.length, total, byCategory });
+});
+```
 
-No other part of the research needs to change — `verified-research.md` confirms the three
-seeded-defect fix directions (Defect 1 at `src/expenses.js:56`, Defect 2 at
-`src/expenses.js:29`, Defect 3 at `src/expenses.js:12,75`) are each independently Verified and
-will remain valid once this single sentence is corrected.
+- **Why:** Routing through the existing `filterExpenses(list, query)` helper (already used
+  correctly by `GET /expenses` at line 46) makes `/summary` agree with `/expenses` for the
+  same query, per the expected behavior in `context/bugs/001/bug-context.md`.
 
-## Next step
+---
 
-Re-run the Bug Researcher (or hand-correct the one sentence above) to produce a corrected
-`codebase-research.md`, then re-run the Research Verifier. Once `verified-research.md` reports
-**Gate: PASS** (Level A or B), re-run the Bug Planner to produce the full before/after change
-plan for Defects 1–3 and the security fix.
+## Change 2 — date-range filter drops the upper-bound day
+
+- **Target:** `src/expenses.js`, `filterExpenses()`, the `query.to` branch (lines 25-30).
+- **Which defect:** `context/bugs/002` (logic / boundary defect).
+
+**Before:**
+
+```js
+  if (query.to) {
+    const to = Date.parse(query.to);
+    // SEEDED BUG (context/bugs/002): the upper bound is exclusive, so an expense dated
+    // exactly `to` is dropped from the range. It should be inclusive (`<=`).
+    result = result.filter((e) => Date.parse(e.date) < to);
+  }
+```
+
+**After:**
+
+```js
+  if (query.to) {
+    const to = Date.parse(query.to);
+    result = result.filter((e) => Date.parse(e.date) <= to);
+  }
+```
+
+- **Why:** The date range must be inclusive on both ends (the `from` branch already uses
+  `>=`); switching `<` to `<=` makes `?from=2026-01-01&to=2026-01-31` return `[1, 2, 3]`
+  instead of dropping boundary id 3, per `context/bugs/002/bug-context.md`.
+
+---
+
+## Change 3 — hardcoded API secret + insecure comparison
+
+- **Target:** `src/expenses.js`, the `API_KEY` constant (lines 7-12) and the
+  `DELETE /expenses/:id` handler (lines 73-83).
+- **Which defect:** `context/bugs/003` (security vulnerability — both halves required).
+
+### 3a. Imports
+
+**Before:**
+
+```js
+const express = require('express');
+const store = require('./store');
+const { validateExpense } = require('./validation');
+```
+
+**After:**
+
+```js
+const crypto = require('crypto');
+const express = require('express');
+const store = require('./store');
+const { validateExpense } = require('./validation');
+```
+
+### 3b. Secret source
+
+**Before:**
+
+```js
+// API key guarding destructive operations.
+//
+// SEEDED SECURITY ISSUE (context/bugs/003): the secret is hardcoded in source (so it
+// leaks to anyone with repo access and cannot be rotated without a redeploy), and the
+// check below compares it with loose `==`, which is neither type-safe nor constant-time.
+const API_KEY = 'sk_live_9f8c2b1a7e4d';
+```
+
+**After:**
+
+```js
+// API key guarding destructive operations. Read from the environment — never hardcode a
+// secret in source. If unset, the DELETE route fails closed (see the handler below).
+const API_KEY = process.env.API_KEY;
+```
+
+### 3c. Comparison
+
+**Before:**
+
+```js
+router.delete('/expenses/:id', (req, res) => {
+  const provided = req.header('x-api-key');
+  if (provided == API_KEY) {
+    const removed = store.remove(Number(req.params.id));
+    if (!removed) {
+      return res.status(404).json({ error: 'Expense not found' });
+    }
+    return res.status(204).send();
+  }
+  return res.status(401).json({ error: 'Unauthorized' });
+});
+```
+
+**After:**
+
+```js
+router.delete('/expenses/:id', (req, res) => {
+  const provided = req.header('x-api-key');
+
+  if (!API_KEY || typeof provided !== 'string') {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+
+  const providedBuf = Buffer.from(provided);
+  const expectedBuf = Buffer.from(API_KEY);
+  const authorized =
+    providedBuf.length === expectedBuf.length &&
+    crypto.timingSafeEqual(providedBuf, expectedBuf);
+
+  if (!authorized) {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+
+  const removed = store.remove(Number(req.params.id));
+  if (!removed) {
+    return res.status(404).json({ error: 'Expense not found' });
+  }
+  return res.status(204).send();
+});
+```
+
+- **Why:** Moves the secret out of source into `process.env.API_KEY` (fail closed when
+  unset) and replaces the loose, non-constant-time `==` with a length check followed by
+  `crypto.timingSafeEqual`, so a mismatched length never reaches `timingSafeEqual` (which
+  throws on unequal-length buffers per the verified research, claim 27). Both halves of
+  the remediation are required — a half-fix leaves the finding open per
+  `context/bugs/003/bug-context.md`.
+
+---
+
+## Change 4 — floating-point amount validation rejects valid two-decimal amounts
+
+- **Target:** `src/validation.js`, `hasAtMostTwoDecimals()` (lines 27-29).
+- **Which defect:** `context/bugs/004` (logic defect, floating point — found by the
+  pipeline, not seeded).
+
+**Before:**
+
+```js
+function hasAtMostTwoDecimals(n) {
+  return Math.round(n * 100) === n * 100;
+}
+```
+
+**After:**
+
+```js
+function hasAtMostTwoDecimals(n) {
+  return Math.abs(Math.round(n * 100) - n * 100) < 1e-9;
+}
+```
+
+- **Why:** Comparing the rounded and raw values with a tolerance instead of strict
+  equality tolerates IEEE-754 rounding error (`19.99 * 100 === 1998.9999999999998`) while
+  still rejecting genuinely over-precise amounts like `1.005`, per the expected behavior in
+  `context/bugs/004/bug-context.md`.
+
+---
 
 ## Test command
 
-Not applicable this run — no code changes are planned. Once the gate passes and a full plan is
-produced, the Fixer will still run `npm test` to verify.
+```
+npm test
+```
+
+This is how the Bug Fixer verifies all four changes (existing tests plus any new
+regression tests, including the Unit Test Generator's later additions).
 
 ## Manual verification
 
-Not applicable this run — no fixes are planned pending the research correction above.
+Assumes the server is running (`PORT` defaults to `3000`) and seed data from
+`src/index.js` is loaded (ids 1-3: `food 12.50` on `2026-01-05`, `transport 40.00` on
+`2026-01-10`, `food 8.25` on `2026-01-31`).
+
+**Change 1 — `/summary` respects filters:**
+
+```
+curl -s 'http://localhost:3000/expenses?category=food'
+curl -s 'http://localhost:3000/summary?category=food'
+# expect summary: {"count":2,"total":20.75,"byCategory":{"food":20.75}}
+```
+
+**Change 2 — inclusive upper date bound:**
+
+```
+curl -s 'http://localhost:3000/expenses?from=2026-01-01&to=2026-01-31'
+# expect ids [1, 2, 3] (id 3, dated exactly 2026-01-31, now included)
+```
+
+**Change 3 — secret from env + constant-time compare:**
+
+```
+API_KEY=sk_live_9f8c2b1a7e4d node src/index.js &
+
+curl -s -o /dev/null -w '%{http_code}\n' -X DELETE http://localhost:3000/expenses/2 \
+  -H 'x-api-key: sk_live_9f8c2b1a7e4d'
+# expect 204
+
+curl -s -o /dev/null -w '%{http_code}\n' -X DELETE http://localhost:3000/expenses/1 \
+  -H 'x-api-key: nope'
+# expect 401
+
+curl -s -o /dev/null -w '%{http_code}\n' -X DELETE http://localhost:3000/expenses/1
+# no header at all (API_KEY unset case): expect 401, and confirm the literal
+# 'sk_live_9f8c2b1a7e4d' no longer appears anywhere in src/expenses.js
+```
+
+**Change 4 — two-decimal amounts accepted:**
+
+```
+curl -s -X POST http://localhost:3000/expenses \
+  -H 'Content-Type: application/json' \
+  -d '{"amount":8.29,"category":"food","date":"2026-02-01"}'
+# expect 201, not 400
+
+curl -s -X POST http://localhost:3000/expenses \
+  -H 'Content-Type: application/json' \
+  -d '{"amount":1.005,"category":"food","date":"2026-02-01"}'
+# expect 400 (still rejected: over-precise)
+```

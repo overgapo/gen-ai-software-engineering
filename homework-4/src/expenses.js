@@ -1,15 +1,13 @@
+const crypto = require('crypto');
 const express = require('express');
 const store = require('./store');
 const { validateExpense } = require('./validation');
 
 const router = express.Router();
 
-// API key guarding destructive operations.
-//
-// SEEDED SECURITY ISSUE (context/bugs/003): the secret is hardcoded in source (so it
-// leaks to anyone with repo access and cannot be rotated without a redeploy), and the
-// check below compares it with loose `==`, which is neither type-safe nor constant-time.
-const API_KEY = 'sk_live_9f8c2b1a7e4d';
+// API key guarding destructive operations. Read from the environment — never hardcode a
+// secret in source. If unset, the DELETE route fails closed (see the handler below).
+const API_KEY = process.env.API_KEY;
 
 // Shared filter used by GET /expenses. Supports ?category=, ?from=, ?to=.
 function filterExpenses(list, query) {
@@ -24,9 +22,7 @@ function filterExpenses(list, query) {
   }
   if (query.to) {
     const to = Date.parse(query.to);
-    // SEEDED BUG (context/bugs/002): the upper bound is exclusive, so an expense dated
-    // exactly `to` is dropped from the range. It should be inclusive (`<=`).
-    result = result.filter((e) => Date.parse(e.date) < to);
+    result = result.filter((e) => Date.parse(e.date) <= to);
   }
 
   return result;
@@ -48,12 +44,9 @@ router.get('/expenses', (req, res) => {
 });
 
 router.get('/summary', (req, res) => {
-  // The summary should describe the SAME filtered set a client sees from GET /expenses,
-  // so passing ?category=food here should total only food expenses.
-  //
-  // SEEDED BUG (context/bugs/001): the query filter is ignored — totals are always
-  // computed over every stored expense, so the summary disagrees with the filtered list.
-  const rows = store.all();
+  // Reuse the shared filter so the summary always describes the same set GET /expenses
+  // returns for the same query.
+  const rows = filterExpenses(store.all(), req.query);
   const total = rows.reduce((sum, e) => sum + e.amount, 0);
   const byCategory = {};
   for (const e of rows) {
@@ -72,14 +65,26 @@ router.get('/expenses/:id', (req, res) => {
 
 router.delete('/expenses/:id', (req, res) => {
   const provided = req.header('x-api-key');
-  if (provided == API_KEY) {
-    const removed = store.remove(Number(req.params.id));
-    if (!removed) {
-      return res.status(404).json({ error: 'Expense not found' });
-    }
-    return res.status(204).send();
+
+  if (!API_KEY || typeof provided !== 'string') {
+    return res.status(401).json({ error: 'Unauthorized' });
   }
-  return res.status(401).json({ error: 'Unauthorized' });
+
+  const providedBuf = Buffer.from(provided);
+  const expectedBuf = Buffer.from(API_KEY);
+  const authorized =
+    providedBuf.length === expectedBuf.length &&
+    crypto.timingSafeEqual(providedBuf, expectedBuf);
+
+  if (!authorized) {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+
+  const removed = store.remove(Number(req.params.id));
+  if (!removed) {
+    return res.status(404).json({ error: 'Expense not found' });
+  }
+  return res.status(204).send();
 });
 
 module.exports = { router, filterExpenses };

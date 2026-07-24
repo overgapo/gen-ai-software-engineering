@@ -1,192 +1,165 @@
-# Verified Research — Expense Tracker Seeded Defects
+# Verified Research — Expense Tracker (`src/`)
 
-Independent verification of `research/codebase-research.md` against `src/**`, performed per
+Independent verification of `research/codebase-research.md`, performed under
 `skills/research-quality-measurement.md`.
 
 ## Verification Summary
 
-- **Gate: FAIL** — the Planner must **not** plan from this document until the one flagged
-  claim is corrected. (Rubric: Level C ⇒ FAIL.)
-- **Quality Level: C — Shaky**
-- **`verified_ratio`: 31/32 (97%)**
-- **Verifier model:** `claude-opus-4-8` · **Date:** 2026-07-23
-- **Method:** every file:line citation reopened in source; every behavioral claim reproduced
-  by executing the real app on an ephemeral port (see References).
+- **Gate: PASS** — the Planner may proceed.
+- **Quality Level: A — Verified**
+- **`verified_ratio`: 36/36 (100%)** — 36 Verified, 0 Discrepant, 0 Unresolvable.
+- **Takeaway:** every file:line citation resolves to the code the research says it does,
+  every quoted snippet is byte-for-byte accurate, and all four root causes were confirmed
+  by executing the code rather than by reading it alone — the plan can be written directly
+  from this research without re-checking it.
 
-**Takeaway:** the research is precise where it counts — all 3 seeded defects are located to
-the exact line, every quoted snippet matches source byte-for-byte, and all three reproduction
-behaviors were confirmed by execution — but it also asserts that `src/validation.js` is
-"correct as written," and that assertion is demonstrably false, which under this rubric is a
-Material discrepancy and forces the gate to FAIL despite the high ratio.
+Verifier model: `claude-opus-4-8`. Date: 2026-07-24.
 
-**Scope note for whoever acts on this gate:** the FAIL is driven by a single claim
-(C36) that is *outside* the three seeded defects. The fix directions for Defects 1, 2 and 3
-are each fully Verified and may be relied on once the research is corrected. The required
-correction is narrow — one sentence in "Notes for the Planner" — not a full re-research.
+Verification method: each cited file was re-opened and read in full (not sampled), and
+every behavioral assertion was reproduced by running Node against the actual modules —
+the floating-point examples, the boundary-filter result, and `crypto.timingSafeEqual`'s
+mismatched-length behavior were all executed, not assumed.
 
 ## Verified Claims
 
 | # | Claim | Location | Verdict | Note |
 |---|-------|----------|---------|------|
-| C1 | `src/expenses.js` is 86 lines total | `src/expenses.js` | Verified | File has 85 newline-terminated lines; "86" is the editor-style count of the position after the trailing newline. Within line-shift tolerance. |
-| C2 | No other `src/` file contains a seeded defect | `context/bugs/001-003` | Verified | All three bug-context docs name `src/expenses.js`. |
-| C3 | Defect 1 maps to `context/bugs/001` | `context/bugs/001/bug-context.md:1-5` | Verified | Title and location match. |
-| C4 | Defect 1 at `src/expenses.js:56`; handler spans 50–63 | `src/expenses.js:50-63` | Verified | Handler opens at 50, closes at 63; line 56 is the cited line. |
-| C5 | Verbatim snippet of lines 50–63 | `src/expenses.js:50-63` | Verified | Exact character match, comments included. |
-| C6 | Critical line 56 is `const rows = store.all();` | `src/expenses.js:56` | Verified | Exact. |
-| C7 | `GET /expenses` (line 46) uses `filterExpenses(store.all(), req.query)` | `src/expenses.js:45-46` | Verified | Exact. |
-| C8 | `filterExpenses` defined at lines 15–33 | `src/expenses.js:15-33` | Verified | Opens at 15, returns at 32, closes at 33. |
-| C9 | `filterExpenses` exported at line 85 | `src/expenses.js:85` | Verified | `module.exports = { router, filterExpenses };` |
-| C10 | `/summary` ignores `?category=`/`?from=`/`?to=`; aggregates over all rows | `src/expenses.js:56-62` | Verified | **Executed:** `/summary?category=food` → `{count:3,total:60.75,byCategory:{food:20.75,transport:40}}` while `/expenses?category=food` → ids `[1,3]`. Identical to unfiltered `/summary`. |
-| C11 | Replacing line 56 alone is sufficient; `count`/`total`/`byCategory` all derive from `rows` | `src/expenses.js:57-62` | Verified | All three consume `rows`; no other store access in the handler. |
-| C12 | Defect 2 maps to `context/bugs/002` | `context/bugs/002/bug-context.md:1-5` | Verified | Matches, incl. expected `<=` fix. |
-| C13 | Defect 2 at `src/expenses.js:29`, inside `filterExpenses` | `src/expenses.js:29` | Verified | Exact. |
-| C14 | Verbatim snippet of lines 25–30 | `src/expenses.js:25-30` | Verified | Exact character match. |
-| C15 | The `query.to` branch filters with strict `<` | `src/expenses.js:29` | Verified | `result = result.filter((e) => Date.parse(e.date) < to);` |
-| C16 | Bare `YYYY-MM-DD` parses to midnight UTC, so a record dated exactly `to` fails `< to` | `src/expenses.js:26,29` | Verified | Date-only forms are UTC per ES spec; confirmed by the exclusion in C19. |
-| C17 | The `from` branch "three lines above (line 23)" correctly uses `>=` | `src/expenses.js:23` | Verified | Line 23 is `>=` as cited. Prose "three lines above" is loose (it is 6 lines above line 29), but the explicit citation resolves correctly. |
-| C18 | `src/index.js:10` seeds `id: 3`, `date: '2026-01-31'` | `src/index.js:10` | Verified | Exact. |
-| C19 | `?from=2026-01-01&to=2026-01-31` returns only ids `[1,2]`, dropping id 3 | `src/expenses.js:29` | Verified | **Executed:** both `filterExpenses` directly and `GET /expenses` returned `[1,2]`. |
-| C20 | Changing line 29 to `<=` fixes it | `src/expenses.js:29` | Verified | Matches `context/bugs/002:28-34` expected behavior. |
-| C21 | Helper is shared by `/expenses` and (post-Defect-1) `/summary`; one edit site | `src/expenses.js:15,46` | Verified | `filterExpenses` has exactly one definition and one call site today. |
-| C22 | Defect 3 maps to `context/bugs/003` | `context/bugs/003/bug-context.md:1-5` | Verified | Matches, incl. both sub-problems. |
-| C23 | Secret at line 12; comparison at line 75; DELETE handler lines 73–83 | `src/expenses.js:12,73-83` | Verified | All three exact. |
-| C24 | Verbatim snippet of lines 7–12 | `src/expenses.js:7-12` | Verified | Exact character match. |
-| C25 | Verbatim snippet of lines 73–83 | `src/expenses.js:73-83` | Verified | Exact character match. |
-| C26 | Literal `'sk_live_9f8c2b1a7e4d'` is committed to source | `src/expenses.js:12` | Verified | Exact. |
-| C27 | `provided == API_KEY` is loose (`==`, not `===`) | `src/expenses.js:75` | Verified | Exact. |
-| C28 | The comparison is not constant-time and can short-circuit on first mismatch | `src/expenses.js:75` | Verified | Standard characterization of JS string `==`; consistent with `context/bugs/003:22-23`. Research correctly hedges with "in principle". |
-| C29 | `req.header()` returns string or `undefined`, so type-juggling risk is smaller than the hardcoding risk | `src/expenses.js:74-75` | Verified | **Executed:** omitting the header yields 401, not a bypass — `undefined == '...'` is `false`. |
-| C30 | `API_KEY` is declared once (12) and read once (75); no other reference | `src/expenses.js:12,75` | Verified | Repo-wide search over `src/` returns exactly those 2 hits. |
-| C31 | The hardcoded key authorizes deletion | `src/expenses.js:73-83` | Verified | **Executed:** correct key → 204; wrong key → 401; no key → 401. |
-| C32 | Fix = env var + `crypto.timingSafeEqual` with a length guard (it throws on unequal lengths) | `src/expenses.js:12,75` | Verified | Matches `context/bugs/003:36-40`; length-guard requirement is accurate. |
-| C33 | `crypto` is a Node builtin; no new dependency, just add a require | `src/expenses.js:1-3` | Verified | No `crypto` import exists anywhere in `src/` today. |
-| C34 | All three defects are isolated to `src/expenses.js` | `src/**` | Verified | Confirmed against all five source files. |
-| C35 | `app.js`, `store.js`, `validation.js`, `index.js` contain no *seeded* defects | `src/**`, `context/bugs/**` | Verified | No bug-context doc references them. |
-| C36 | `validation.js`'s amount/date checks (lines 8–22) "are correct as written and do not need changes" | `src/validation.js:12,27-29` | **Discrepant** | **Material** — see Discrepancies Found. |
-| C37 | `src/index.js:10` seeds the boundary record on purpose | `src/index.js:5-6,10` | Verified | The source comment states exactly this. |
-| C38 | Reference ranges for `app.js:1-13`, `index.js:1-18`, `store.js:1-35`, `validation.js:1-32`, and the six `expenses.js` ranges | `src/**` | Verified | All ranges land on the described code. `store.js` (34 lines) and `validation.js` (31 lines) show the same +1 editor-style convention as C1; within tolerance. |
-
-*(Rows C1–C37 are the substantive claims counted for the ratio; C38 consolidates the
-References section's range citations as a single claim. Total = 32 claims, 31 Verified.)*
+| 1 | `index.js` seeds three expenses and starts the server | `src/index.js:7-11`, `:16-18` | Verified | Three records; `app.listen(PORT)` present |
+| 2 | `app.js` wires `express.json()` and mounts `router` at `/` | `src/app.js:8-9` | Verified | Exact |
+| 3 | `store.js` is a tiny in-memory array-backed store | `src/store.js:4`, `:13-15` | Verified | `let expenses = []`; `all()` returns it |
+| 4 | `validation.js` validates `POST /expenses` payloads | `src/validation.js:4-25`; `src/expenses.js:36` | Verified | `validateExpense(req.body)` is the sole call site |
+| 5 | Defect 1 lives in the `GET /summary` handler at `50-63` | `src/expenses.js:50-63` | Verified | Handler spans exactly 50–63 |
+| 6 | The defect itself is at `56-57` | `src/expenses.js:56-57` | Verified | The causal line is `56`; `57` is the derived `reduce` |
+| 7 | Quoted `/summary` handler snippet is verbatim | `src/expenses.js:50-63` | Verified | Byte-for-byte, including comments |
+| 8 | Handler carries an inline `SEEDED BUG (context/bugs/001)` comment | `src/expenses.js:54-55` | Verified | Confirms intent, not incidental |
+| 9 | `rows` is assigned from `store.all()` directly | `src/expenses.js:56` | Verified | Exact |
+| 10 | `filterExpenses(list, query)` is defined at `15-33` | `src/expenses.js:15-33` | Verified | Exact |
+| 11 | `GET /expenses` correctly calls `filterExpenses(store.all(), req.query)` | `src/expenses.js:45-48`, call at `:46` | Verified | Exact |
+| 12 | `module.exports = { router, filterExpenses }` | `src/expenses.js:85` | Verified | Last line of file |
+| 13 | Root cause: `/summary` ignores `req.query`, so it disagrees with `GET /expenses` | `src/expenses.js:46` vs `:56` | Verified | `count`/`total`/`byCategory` all derive from unfiltered `rows` |
+| 14 | Fix is a one-line change routing `/summary` through `filterExpenses` | `src/expenses.js:56`, `:85` | Verified | Same-file scope; no new import needed |
+| 15 | Defect 2 is the `query.to` branch at `25-30` | `src/expenses.js:25-30` | Verified | Exact |
+| 16 | Quoted `to`-branch snippet is verbatim | `src/expenses.js:25-30` | Verified | Byte-for-byte |
+| 17 | The offending comparison at `:29` uses strict `<` | `src/expenses.js:29` | Verified | `Date.parse(e.date) < to` |
+| 18 | The `from` branch at `21-24` is already inclusive (`>=`) | `src/expenses.js:21-24` | Verified | The `>=`/`<` asymmetry is real |
+| 19 | Root cause: `Date.parse(to)` is midnight, so a record dated exactly `to` fails `<` | `src/expenses.js:26`, `:29` | Verified | Reproduced by execution |
+| 20 | Seed id 3 (`Coffee`, `2026-01-31`) sits on the boundary, with a comment saying so | `src/index.js:10`; comment at `:5-6` | Verified | Citation `:10` is exact for the record; the quoted comment text is verbatim from `:5-6` of the same block |
+| 21 | `?from=2026-01-01&to=2026-01-31` returns only ids `[1, 2]` | `src/expenses.js:15-33` | Verified | **Executed** against `filterExpenses` — returned `[1, 2]`, id 3 dropped |
+| 22 | Hardcoded `API_KEY = 'sk_live_9f8c2b1a7e4d'` | `src/expenses.js:12` | Verified | Literal committed to source |
+| 23 | `DELETE /expenses/:id` at `73-83`; comparison at `:75` | `src/expenses.js:73-83`, `:75` | Verified | Exact |
+| 24 | Both quoted security snippets are verbatim | `src/expenses.js:7-12`, `:73-83` | Verified | Byte-for-byte |
+| 25 | The check uses loose `==` and has no length guard | `src/expenses.js:75` | Verified | `provided == API_KEY`, non-constant-time |
+| 26 | `crypto` is not currently imported in `expenses.js` | `src/expenses.js:1-3` | Verified | Zero occurrences of `crypto` in the file |
+| 27 | `crypto.timingSafeEqual` throws on mismatched lengths (so a length guard is needed) | Node built-in | Verified | **Executed**: throws `Input buffers must have the same byte length` |
+| 28 | Defect 4 is `hasAtMostTwoDecimals()` at `27-29`, quoted verbatim | `src/validation.js:27-29` | Verified | Byte-for-byte |
+| 29 | Called from `validateExpense()` at `:12`, snippet verbatim | `src/validation.js:12-14` | Verified | Exact |
+| 30 | `19.99*100 = 1998.9999999999998`, `0.07*100 = 7.000000000000001`, `8.29*100 = 828.9999999999999`, `4.35*100 = 434.99999999999994` | `src/validation.js:28` | Verified | **Executed** — all four values reproduce exactly as written; each returns `false` |
+| 31 | Seed amounts `12.5`, `40.0`, `8.25` are exactly representable, masking the bug | `src/index.js:8-10` | Verified | **Executed**: `12.5`, `8.25` return `true` — demo data cannot surface the defect |
+| 32 | Bug 004 was found by the pipeline (verifier rejected a false "validation is correct" claim), not seeded | `context/bugs/004/bug-context.md:1-8` | Verified | "Discovered by: the pipeline itself, not seeded by the author" |
+| 33 | Both proposed fixes accept `8.29/19.99/0.07/4.35/1.10/12.5/8.25` and reject `1.005/0.001` | `src/validation.js:27-29` | Verified | **Executed** both the epsilon and decimal-string variants — correct on all nine values |
+| 34 | Defect 3's fix touches only `src/expenses.js` | `src/expenses.js:12`, `:73-83` | Verified | `API_KEY` has no other reference in the repo source |
+| 35 | Defect 4's fix is isolated; `hasAtMostTwoDecimals` has one call site, no signature change | `src/validation.js:12`, `:27` | Verified | Sole call site confirmed by repo-wide search |
+| 36 | No existing test files under `tests/`/`test/` | `tests/` | Verified | The `tests/` directory exists but is empty — the Test Generator starts from scratch |
 
 ## Discrepancies Found
 
-### C36 — "`validation.js`'s amount/date checks are correct as written" — **Material**
+**None.**
 
-**Where:** `research/codebase-research.md`, "Notes for the Planner", first bullet.
+All 36 claims were checked individually against the current source and each one passed.
+This is an earned empty section, not an assumed one: every citation was resolved by
+re-opening the file, every quoted snippet was compared character-by-character, and the
+four behavioral claims that could not be settled by reading alone (claims 21, 27, 30, 33)
+were settled by executing the code.
 
-**What the research said:**
-> `validation.js`'s amount/date checks (lines 8–22) are correct as written and do not need changes.
+Two citations carry harmless drift, both inside the skill's ≤2-line tolerance or
+otherwise landing on the correct code, and neither changes what a Planner would do:
 
-(Restated in the References section as "`src/validation.js:1-32` — expense payload
-validation; no defects.")
+- **Claim 20** — the research cites `src/index.js:10` for the boundary-dated seed record.
+  That line is exactly right; the comment it quotes actually lives at `src/index.js:5-6`,
+  four lines above, and the research gave no separate line citation for it. The quoted
+  comment text is verbatim.
+- **Reference list** — `src/store.js:1-35` is cited for a file that ends at line 34
+  (1-line overshoot). The described contents (`reset`, `all`, `getById`, `add`, `remove`)
+  are accurate.
 
-**What the source actually does:** the amount check at `src/validation.js:12` delegates to
-`hasAtMostTwoDecimals` at `src/validation.js:27-29`:
-
-```js
-function hasAtMostTwoDecimals(n) {
-  return Math.round(n * 100) === n * 100;
-}
-```
-
-Multiplying a binary float by 100 does not round-trip exactly, so legitimate two-decimal
-amounts are rejected. Verified by execution:
-
-| Input | `n * 100` | Result |
-|-------|-----------|--------|
-| `8.29` | `828.9999999999999` | **rejected** — "amount must have at most 2 decimal places" |
-| `0.07` | `7.000000000000001` | **rejected** — same |
-| `8.25` | `825` | accepted (0.25 is binary-exact) |
-| `12.5` | `1250` | accepted |
-
-`POST /expenses` with `{ amount: 8.29, category: 'food', date: '2026-01-05' }` therefore
-returns **400**, not 201. The validator is not "correct as written": it rejects valid input.
-
-**Corrected reference:** `src/validation.js:27-29` (`hasAtMostTwoDecimals`), reached from
-`src/validation.js:12`. The accurate statement is: *`validation.js` contains no **seeded**
-defect (no `context/bugs/` entry references it), but its two-decimal check has a
-floating-point flaw that rejects valid amounts such as `8.29` and `0.07`.*
-
-**Why Material rather than Cosmetic.** This is not citation drift or a paraphrase — it is a
-behavioral assertion that is false, and §1 of the skill counts behavioral assertions as
-claims. It sits in the section that scopes downstream work, so it can misdirect a consumer:
-the Unit Test Generator, told validation is correct, may write a FIRST test asserting
-`amount: 8.29` → 201, which fails against unmodified code.
-
-**Why not Critical.** No seeded fix depends on it. Defects 1–3 can be planned and fixed
-correctly even with this claim present, so it does not produce a broken or unsafe fix.
-
-**What a corrected re-run must say:** replace the "correct as written" bullet with the
-accurate statement above, and state explicitly whether repairing `hasAtMostTwoDecimals` is
-in or out of scope for this run (it is an unseeded, pre-existing defect). No other part of
-the research needs to change.
+Neither rises to Cosmetic-discrepancy status under §3, since both citations resolve to
+the right code; they are recorded here for completeness.
 
 ## Research Quality Assessment
 
-**Level C — Shaky. Gate: FAIL.**
+**Level A — Verified.** `verified_ratio` = 36/36 (1.00) with zero Cosmetic, zero Material,
+and zero Critical discrepancies, which is the exact criterion for A in §4 of the skill.
+No straddle rule applies — the run does not touch the B threshold, since B requires at
+least one Cosmetic discrepancy to be the limiting factor and there are none.
 
-**Counts:** 32 claims, 31 Verified, 1 Discrepant (1 Material, 0 Critical, 0 Cosmetic,
-0 Unresolvable). `verified_ratio` = 31/32 = 0.97.
+What earns the A specifically:
 
-**Reasoning against the rubric.** The ratio alone (0.97) clears Level B's ≥ 0.90 threshold,
-but Level B additionally requires "only Cosmetic discrepancies, no Material/Critical." C36 is
-Material — the discrepancy classes are exhaustive, and it is neither Cosmetic (it is a false
-behavioral assertion, not line drift or an accurate paraphrase) nor Critical (no seeded fix
-depends on it). Level C's second criterion — "≥1 Material discrepancy but no Critical" —
-matches exactly. The run straddles B (by ratio) and C (by class), and the rubric directs
-choosing the lower level. Level C ⇒ **FAIL**: research must be corrected before planning.
+- **The claims that matter most are the ones best evidenced.** Under §3, a Material error
+  on the actual buggy line or the security-sensitive comparison would be Critical and
+  force a D. Those four lines — `expenses.js:56`, `expenses.js:29`, `expenses.js:75`, and
+  `validation.js:28` — are each cited to the exact line and quoted verbatim. There is no
+  ambiguity for the Planner to resolve.
+- **Root causes are correct, not just locations.** A citation can resolve while the stated
+  cause is wrong (a Material discrepancy). Here each cause survives an independent check:
+  the `/summary` bypass of `filterExpenses`, the midnight-timestamp equality that `<`
+  excludes, the dual hardcoded-secret/non-constant-time finding, and the IEEE-754
+  round-trip failure are all accurate characterizations, not plausible-sounding guesses.
+- **The falsifiable numeric claims hold exactly.** The research printed four specific
+  float products; all four reproduce digit-for-digit. This is where a fabricated research
+  document usually breaks, and it did not.
+- **The research is honest about its own limits.** It flags that `8.25`/`12.5` would let a
+  regression test pass with the bug still present, and that a mid-range-only test would not
+  catch Defect 2. Both are true and I confirmed the first by execution. Research that names
+  the tests that would falsely reassure is materially more useful than research that
+  merely locates the bug.
+- **The Defect 4 provenance claim checks out.** `context/bugs/004/bug-context.md` records
+  it as pipeline-discovered rather than seeded, matching the research's account.
 
-**What the research did well** (and what should survive a re-run unchanged):
-- Every fix-critical citation is exact: lines 56, 29, 12 and 75 all resolve precisely, with
-  zero line drift across ten distinct ranges — unusual precision.
-- All four quoted snippets match source byte-for-byte, comments included.
-- All three reproduction behaviors independently reproduced by execution, not just read.
-- The three fix directions are each correct, minimal, and consistent with their
-  `bug-context.md` — including the non-obvious detail that `timingSafeEqual` throws on
-  unequal-length buffers and needs a length guard first.
-- The negative claims were checked, not assumed: `API_KEY` really does have exactly two
-  references, and `crypto` really is absent from `src/`.
+Nothing would raise this level — A is the ceiling. To *hold* it on a re-run, the research
+must keep quoting exact float products rather than rounding them, keep citing the buggy
+line itself rather than the enclosing handler, and continue re-reading `src/` instead of
+carrying forward prior conclusions (the failure mode that produced Defect 4 in the first
+place). Two small precision improvements, neither gate-affecting: cite the boundary
+comment at `index.js:5-6` alongside the seed record at `:10`, and correct the
+`store.js:1-35` range to `1-34`.
 
-**What would raise the level:**
-- **To B (Sound):** correct the C36 bullet as specified above. Nothing else is required —
-  that single edit removes the only non-Verified claim.
-- **To A (Verified):** the C36 correction, plus tightening two loose-prose spots that were
-  passed under tolerance but are still inaccurate as written — the "three lines above" in
-  Defect 2 (line 23 is 6 lines above line 29) and the consistent +1 file line counts (86/35/32
-  for files of 85/34/31 lines).
+**Gate for the Planner: PASS.** Plan directly from `research/codebase-research.md`; no
+claim requires re-research.
 
 ## References
 
-Every location below was opened and read during this verification.
+Files opened and read in full during verification:
 
-**Source (ground truth):**
-- `src/expenses.js:1-85` — read in full; specifically 7–12 (API_KEY), 15–33 (`filterExpenses`,
-  `from` at 23, `to` at 29), 35–48 (`POST`/`GET /expenses`, call site at 46), 50–63
-  (`GET /summary`, defect at 56), 65–71 (`GET /expenses/:id`), 73–83 (`DELETE`, comparison at
-  75), 85 (exports).
-- `src/validation.js:1-31` — 4–25 (`validateExpense`), 12 (decimal check call), 27–29
-  (`hasAtMostTwoDecimals` — the C36 discrepancy).
-- `src/index.js:1-18` — 5–6 (boundary-case comment), 7–11 (seed data, `id: 3` at line 10).
-- `src/store.js:1-34` — 8–11 (`reset`), 13–15 (`all`), 27–32 (`remove`).
-- `src/app.js:1-13` — 6–11 (`createApp`).
+- `src/expenses.js:1-85` — all four route handlers, `filterExpenses`, `API_KEY`, exports
+  - `:7-12` — hardcoded `API_KEY` and its `SEEDED SECURITY ISSUE` comment (claims 22, 24)
+  - `:15-33` — `filterExpenses` (claims 10, 15–19)
+  - `:21-24` — inclusive `from` branch, `>=` (claim 18)
+  - `:25-30` — exclusive `to` branch, `<` (claims 15–17)
+  - `:35-43` — `POST /expenses`, the `validateExpense` call site (claim 4)
+  - `:45-48` — `GET /expenses`, correct `filterExpenses` use (claim 11)
+  - `:50-63` — `GET /summary`, unfiltered aggregation (claims 5–9, 13)
+  - `:65-71` — `GET /expenses/:id`
+  - `:73-83` — `DELETE /expenses/:id`, loose `==` at `:75` (claims 23–25)
+  - `:85` — module exports (claim 12)
+- `src/validation.js:1-31` — `validateExpense` and `hasAtMostTwoDecimals`
+  - `:12-14` — call site of `hasAtMostTwoDecimals` (claims 29, 35)
+  - `:27-29` — the float-equality comparison (claims 28, 30, 33)
+- `src/index.js:1-18` — seed data and listener
+  - `:5-6` — boundary-intent comment (claim 20)
+  - `:8-10` — the three seeded amounts and the boundary-dated record (claims 20, 31)
+- `src/store.js:1-34` — in-memory store; `reset`, `all`, `getById`, `add`, `remove` (claim 3)
+- `src/app.js:1-13` — `createApp()` wiring (claim 2)
+- `context/bugs/004/bug-context.md:1-40` — Defect 4 provenance (claim 32)
+- `research/codebase-research.md:1-255` — the document under verification
+- `tests/` — confirmed present but empty (claim 36)
 
-**Seeded-defect specifications:**
-- `context/bugs/001/bug-context.md:1-33`
-- `context/bugs/002/bug-context.md:1-39`
-- `context/bugs/003/bug-context.md:1-47`
+Commands executed to verify behavioral claims (reproducible):
 
-**Document under verification:**
-- `research/codebase-research.md:1-188`
-
-**Executed checks** (run against the real app on an ephemeral port; the repository was not
-modified):
-- `filterExpenses(store.all(), {from:'2026-01-01', to:'2026-01-31'})` → ids `[1,2]` (C19).
-- `GET /expenses?from=2026-01-01&to=2026-01-31` → ids `[1,2]` (C19).
-- `GET /summary?category=food` → `{count:3,total:60.75,byCategory:{food:20.75,transport:40}}`
-  vs. `GET /expenses?category=food` → ids `[1,3]` (C10).
-- `DELETE /expenses/2` with `x-api-key: sk_live_9f8c2b1a7e4d` → 204; wrong key → 401; header
-  omitted → 401 (C29, C31).
-- `validateExpense` probes at amounts `8.29`, `0.07`, `1.005`, `12.345`, `-5`, `12.5`, `100.1`
-  (C36).
+- `node -e "…"` over `[19.99, 0.07, 8.29, 4.35, 1.10, 12.5, 8.25, 1.005, 0.001]` printing
+  `n*100`, `Math.round(n*100)`, and the predicate result — claims 30, 31, 33.
+- `node -e "…"` calling `filterExpenses(seed, {from:'2026-01-01', to:'2026-01-31'})` on the
+  `index.js` seed data — returned `[1, 2]`, claim 21.
+- `node -e "crypto.timingSafeEqual(Buffer.from('abc'), Buffer.from('abcd'))"` — throws
+  `Input buffers must have the same byte length`, claim 27.
+- Repo-wide search for `hasAtMostTwoDecimals`, `filterExpenses`, and `crypto` in `src/` —
+  claims 26, 34, 35.
