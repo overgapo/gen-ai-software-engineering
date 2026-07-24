@@ -63,8 +63,22 @@ It ships broken, with each defect documented in `context/bugs/`:
 | [001](context/bugs/001/bug-context.md) | Logic | `GET /summary` | Ignores the query filter — totals every expense, so the summary disagrees with the filtered list. |
 | [002](context/bugs/002/bug-context.md) | Boundary | `filterExpenses()` | Date range uses `<` instead of `<=`, dropping a record dated exactly on `to`. |
 | [003](context/bugs/003/bug-context.md) | **Security** | `DELETE /expenses/:id` | API key is **hardcoded in source** and compared with loose, non-constant-time `==`. |
+| [004](context/bugs/004/bug-context.md) | Logic | `hasAtMostTwoDecimals()` | **Found by the pipeline, not seeded.** `Math.round(n*100) === n*100` fails on floating-point round-trips, so valid amounts (`19.99`, `0.07`, `8.29`) are rejected with `400`. |
 
 After a pipeline run the same app demonstrates the fixes and passes the generated tests.
+
+### Defect 004 is the interesting one
+
+The first pipeline run **refused to fix anything** — and that was correct. The Bug Researcher
+claimed `src/validation.js` was "correct as written"; the Research Verifier independently
+checked that claim, found it false, classified it **Material**, and graded the research
+**Level C (Shaky) → gate FAIL** per the research-quality skill. The Planner then authorized
+no code changes and the Bug Fixer recorded `BLOCKED` rather than editing `src/`.
+
+So the quality gate stopped a shaky premise from reaching the code, *and* the disagreement
+surfaced a real defect the author never planted. That run's artifacts are committed as
+evidence (see the commit "first pipeline run — blocked by the research quality gate"). Bug
+004 was then documented and the pipeline re-run against all four defects.
 
 ---
 
