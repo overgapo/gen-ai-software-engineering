@@ -1,0 +1,38 @@
+{
+  "mcpServers": {
+    "github": {
+      "type": "http",
+      "url": "https://api.githubcopilot.com/mcp/",
+      "headers": {
+        "Authorization": "Bearer ${GITHUB_PAT}"
+      }
+    },
+    "jira": {
+      "type": "sse",
+      "url": "https://mcp.atlassian.com/v1/sse"
+    },
+    "filesystem": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-filesystem",
+        "."
+      ],
+      "env": {}
+    },
+    "lorem-ipsum": {
+      "type": "stdio",
+      "command": "uv",
+      "args": [
+        "run",
+        "--python",
+        "3.12",
+        "--with-requirements",
+        "custom-mcp-server/requirements.txt",
+        "custom-mcp-server/server.py"
+      ],
+      "env": {}
+    }
+  }
+}

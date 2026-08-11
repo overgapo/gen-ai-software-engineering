@@ -1,0 +1,2 @@
+# Verified against fastmcp 3.4.7 on CPython 3.12.11.
+fastmcp>=3.4,<4
