@@ -89,7 +89,9 @@ Guardrails. These are constraints on *how* the code is written, not features.
   stage's internals or calls it directly.
 - Each stage is a pure decision function (`validate_transaction`, `score_transaction`,
   `screen_transaction`, `settle_transaction`) wrapped by a thin `process_transaction(record) -> dict`
-  that does the envelope bookkeeping. The decision functions take data and return data: no I/O, no
+  that does the envelope bookkeeping. Both are pure: claiming a record, routing the output and
+  writing the audit line live in `pipeline/stage_runner.py`, which every stage shares so that no
+  stage has to re-implement the file protocol (and so no stage is tempted to import another). The decision functions take data and return data: no I/O, no
   clock, no randomness — that is what makes them testable and replayable.
 - The wall clock is injected (`now: datetime | None = None`) so tests are deterministic.
 
@@ -139,7 +141,8 @@ homework-6/
 │   ├── fraud_detector.py        # stage 2
 │   ├── compliance.py            # stage 3
 │   ├── settlement.py            # stage 4
-│   └── reporting.py             # run summary builder
+│   ├── reporting.py             # run summary builder
+│   └── stage_runner.py          # shared file-protocol mechanics (claim/route/audit)
 ├── frontend/
 │   ├── app.py                   # FastAPI: serves dashboard + /api/*, triggers a run
 │   └── static/index.html        # single-page dashboard (no build step)
@@ -151,6 +154,7 @@ homework-6/
 ├── .claude/
 │   ├── commands/{write-spec,run-pipeline,validate-transactions}.md
 │   └── settings.json            # coverage gate hook (blocks push below 80%)
+├── requirements.txt
 ├── research-notes.md  README.md  HOWTORUN.md
 └── docs/presentation.pdf  docs/screenshots/*.png
 ```
@@ -287,6 +291,11 @@ Additive scoring over the closed signal set. Score is capped at 100.
 
 Bands: **LOW** `0–24`, **MEDIUM** `25–59`, **HIGH** `60–100`.
 
+When `usd_equivalent` is `null` — the currency is supported but has no published FX rate — the three
+amount-based signals are **not evaluated**, because there is nothing to compare against and a guessed
+comparison is worse than a missing one. The time, geography and channel signals still apply, and the
+record is held later at settlement with `FX_RATE_UNAVAILABLE` (§9.1).
+
 `HIGH` → terminal `held` with `reason_code: HIGH_RISK`, written to `shared/results/`, never settled.
 `LOW`/`MEDIUM` → continue to compliance with the full `risk` block attached (`score`, `band`,
 `signals[]`) so the decision is explainable after the fact.
@@ -296,7 +305,9 @@ Bands: **LOW** `0–24`, **MEDIUM** `25–59`, **HIGH** `60–100`.
 1. **Watchlist screening.** If `source_account` or `destination_account` ∈ `WATCHLIST_ACCOUNTS` →
    terminal `held`, `reason_code: WATCHLIST_MATCH`. Screening happens on the account identifier; the
    audit record carries the hash, not the account.
-2. **Currency-transaction filing.** If `usd_equivalent >= REPORTING_THRESHOLD` → append
+2. **Currency-transaction filing.** If `usd_equivalent` is `null`, the threshold cannot be
+   evaluated and no filing is made here — the record is held at settlement before any money moves, so
+   nothing became reportable. Otherwise, if `usd_equivalent >= REPORTING_THRESHOLD` → append
    `{"type": "CTR", "threshold": "10000.00", "filed_at": …}` to `compliance.filings[]`. This does not
    block settlement — it is a record-keeping obligation, and conflating the two is exactly the bug
    this note exists to prevent.

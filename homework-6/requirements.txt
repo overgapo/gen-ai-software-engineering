@@ -1,0 +1,7 @@
+# Pipeline core is standard library only. Everything below serves the
+# front-end, the MCP server or the test suite.
+fastapi==0.141.1
+uvicorn==0.53.0
+fastmcp==4.0.5
+pytest==9.1.1
+pytest-cov==7.1.0
