@@ -19,7 +19,6 @@ from pathlib import Path
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
-from starlette.concurrency import run_in_threadpool
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 if str(PROJECT_ROOT) not in sys.path:  # pragma: no cover - script execution
@@ -47,8 +46,17 @@ def _current_summary() -> dict:
     return build_summary(RESULTS_DIR)
 
 
+# On def vs async def below: FastAPI runs a path operation declared with plain
+# `def` in a threadpool, and awaits an `async def` one on the event loop. So the
+# endpoints that read result files from disk -- and the one that runs the whole
+# pipeline -- are plain `def`, while the two that do no blocking work are
+# `async def`, avoiding pointless threadpool overhead.
+
+
 @app.get("/", include_in_schema=False)
-def index() -> FileResponse:
+async def index() -> FileResponse:
+    # FileResponse streams the file asynchronously by itself, so this operation
+    # blocks on nothing.
     return FileResponse(STATIC_DIR / "index.html")
 
 
@@ -80,10 +88,14 @@ def get_result(transaction_id: str) -> JSONResponse:
 
 
 @app.post("/api/run")
-async def trigger_run() -> JSONResponse:
-    """Run the pipeline from scratch. Blocking work stays off the event loop."""
-    summary = await run_in_threadpool(run_pipeline, DEFAULT_INPUT, DEFAULT_SHARED, True)
-    return JSONResponse(summary)
+def trigger_run() -> JSONResponse:
+    """Run the pipeline from scratch.
+
+    A full run is seconds of synchronous file I/O. Declared with plain ``def``
+    so FastAPI hands it to a threadpool worker -- an ``async def`` here would
+    stall the event loop for the whole run and freeze every other request.
+    """
+    return JSONResponse(run_pipeline(DEFAULT_INPUT, DEFAULT_SHARED, clean=True))
 
 
 if __name__ == "__main__":  # pragma: no cover
