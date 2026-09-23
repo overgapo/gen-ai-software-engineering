@@ -50,10 +50,20 @@ class PipelineStateError(RuntimeError):
 
 def prepare_shared(shared_root: Path, clean: bool = False) -> Path:
     shared_root = Path(shared_root)
-    if clean and shared_root.exists():
-        shutil.rmtree(shared_root)
     for sub in config.SHARED_SUBDIRS:
         (shared_root / sub).mkdir(parents=True, exist_ok=True)
+
+    if clean:
+        # Wipe the contents, not the skeleton: the directory layout is
+        # committed (each holds a .gitkeep) and a run should not delete it.
+        for sub in config.SHARED_SUBDIRS:
+            for path in (shared_root / sub).iterdir():
+                if path.name == ".gitkeep":
+                    continue
+                if path.is_dir():
+                    shutil.rmtree(path)
+                else:
+                    path.unlink()
 
     if not clean:
         leftovers = [
