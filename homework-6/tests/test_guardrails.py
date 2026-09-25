@@ -21,6 +21,7 @@ from tests.conftest import FIXED_NOW
 
 PIPELINE_DIR = Path(__file__).resolve().parent.parent / "pipeline"
 MONEY_MODULES = sorted(PIPELINE_DIR.glob("*.py"))
+STAGE_MODULES = [PIPELINE_DIR / f"{stage}.py" for stage in config.STAGE_ORDER]
 ACCOUNT_RE = re.compile(r"ACC-\d{4}")
 
 
@@ -42,12 +43,22 @@ def test_no_float_in_the_money_path(module):
     assert not offences, f"{module.name}: " + "; ".join(offences)
 
 
-@pytest.mark.parametrize("module", MONEY_MODULES, ids=lambda p: p.name)
+def test_every_named_stage_has_a_module():
+    """STAGE_ORDER and the files on disk must not drift apart.
+
+    Without this, renaming a stage would leave the import check below
+    parametrized over files that do not exist -- or, worse, over nothing at
+    all -- and a green suite would be reporting a guarantee it never checked.
+    """
+    missing = [path.name for path in STAGE_MODULES if not path.exists()]
+    assert not missing, f"STAGE_ORDER names modules that do not exist: {missing}"
+    assert len(STAGE_MODULES) == 4
+
+
+@pytest.mark.parametrize("module", STAGE_MODULES, ids=lambda p: p.name)
 def test_no_stage_imports_another_stage(module):
     """Stages talk through files, never through imports (agents.md §6.1)."""
     stages = set(config.STAGE_ORDER)
-    if module.stem not in stages:
-        pytest.skip("not a stage module")
     tree = ast.parse(module.read_text(encoding="utf-8"), filename=str(module))
     imported = set()
     for node in ast.walk(tree):

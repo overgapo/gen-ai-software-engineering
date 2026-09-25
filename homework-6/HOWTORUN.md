@@ -113,7 +113,7 @@ If no run exists yet, every read endpoint returns `404` with
 .venv/bin/python -m pytest
 ```
 
-Expected: **231 passed, 6 skipped**, coverage **100 %** on `pipeline/` and `orchestrator.py`
+Expected: **232 passed**, coverage **100 %** on `pipeline/` and `orchestrator.py`
 (`pytest.ini` fails the run below 80 %).
 
 ```bash

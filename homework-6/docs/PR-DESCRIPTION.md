@@ -61,7 +61,7 @@ rejection reasons:
 [`/run-pipeline`](./homework-6/.claude/commands/run-pipeline.md) ·
 [`/validate-transactions`](./homework-6/.claude/commands/validate-transactions.md)
 
-**231 tests, 100 % coverage** on `pipeline/` and `orchestrator.py` (gate 80 %, spec target 90 %).
+**232 tests, 100 % coverage** on `pipeline/` and `orchestrator.py` (gate 80 %, spec target 90 %).
 The integration test asserts the §9 acceptance table row by row. Several tests assert the **absence**
 of things: no `float()` or float literal in `pipeline/` (AST scan), no stage importing a sibling, no
 `ACC-NNNN` or `description` in a run's audit log.

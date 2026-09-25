@@ -129,7 +129,7 @@ sibling stage — a constraint enforced by an AST test, not just by convention.
 | Front-end | FastAPI + uvicorn, one static HTML page | No build step, no bundle, no CDN dependency |
 | MCP server | FastMCP 4.0.5 (stdio) | Two tools + one resource, read-only and stateless |
 | Docs lookup | context7 MCP | Framework APIs checked against current docs rather than recalled — see `research-notes.md` |
-| Tests | pytest + pytest-cov | 231 tests, 100 % coverage on `pipeline/` and `orchestrator.py` |
+| Tests | pytest + pytest-cov | 232 tests, 100 % coverage on `pipeline/` and `orchestrator.py` |
 | Coverage gate | Claude Code `PreToolUse` hook + `.githooks/pre-push` | Blocks `git push` below 80 % |
 
 ---

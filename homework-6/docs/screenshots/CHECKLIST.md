@@ -30,7 +30,7 @@ a reviewer this is one run rather than a stitched-together screenshot.
 ```
 
 **Frame must show**: the per-module coverage table, the `TOTAL … 100%` row, the line
-`Required test coverage of 80% reached. Total coverage: 100.00%`, and `231 passed, 6 skipped`.
+`Required test coverage of 80% reached. Total coverage: 100.00%`, and `232 passed`.
 
 ---
 
