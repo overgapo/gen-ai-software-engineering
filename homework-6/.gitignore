@@ -1,0 +1,10 @@
+.venv/
+.pytest_cache/
+
+# shared/ is runtime state: the directory layout is committed, its contents
+# are not -- a committed result file would make a stale run look like a fresh
+# one.
+shared/**
+!shared/
+!shared/*/
+!shared/*/.gitkeep

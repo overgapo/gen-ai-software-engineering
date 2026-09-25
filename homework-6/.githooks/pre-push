@@ -1,0 +1,18 @@
+#!/bin/sh
+# The same coverage gate, for pushes made outside Claude Code.
+#
+# Install once:   git config core.hooksPath .githooks
+# Bypass (don't): git push --no-verify
+set -e
+
+DIR="$(cd "$(dirname "$0")/.." && pwd)"
+PY="$DIR/.venv/bin/python"
+[ -x "$PY" ] || PY=python3
+
+echo "coverage gate: running the test suite before push…"
+if ! "$PY" -m pytest --cov=pipeline --cov=orchestrator --cov-fail-under=80 -q; then
+  echo ""
+  echo "PUSH BLOCKED by the coverage gate (minimum 80%)."
+  echo "Fix the failing tests or raise coverage. Do not lower the threshold."
+  exit 1
+fi

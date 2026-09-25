@@ -1,0 +1,282 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>Transaction Processing Pipeline — Capstone</title>
+<style>
+  @page { size: 297mm 167mm; margin: 0; }
+  :root{
+    --ink:#15181d; --muted:#6b7280; --line:#e3e6ea; --bg:#fff; --panel:#f7f8fa;
+    --accent:#2b5bd7; --ok:#177245; --hold:#96620a; --rej:#a3242a;
+  }
+  *{box-sizing:border-box; -webkit-print-color-adjust:exact; print-color-adjust:exact}
+  body{margin:0;font:15px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;color:var(--ink)}
+  .slide{width:297mm;height:167mm;padding:16mm 18mm;page-break-after:always;position:relative;
+         display:flex;flex-direction:column;background:var(--bg);overflow:hidden}
+  .slide:last-child{page-break-after:auto}
+  h1{font-size:40px;line-height:1.1;margin:0 0 10px;letter-spacing:-.02em}
+  h2{font-size:27px;margin:0 0 4px;letter-spacing:-.015em}
+  .kicker{font-size:12px;text-transform:uppercase;letter-spacing:.14em;color:var(--accent);
+          font-weight:700;margin-bottom:12px}
+  .lede{font-size:17px;color:var(--muted);margin:0 0 18px;max-width:78%}
+  .num{position:absolute;right:16mm;bottom:10mm;font-size:11px;color:#b6bcc6;font-variant-numeric:tabular-nums}
+  ul{margin:6px 0 0;padding-left:20px} li{margin-bottom:8px}
+  li b{font-weight:650}
+  code,pre{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+  pre{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:12px 14px;
+      font-size:11.5px;line-height:1.45;margin:0;overflow:hidden;white-space:pre}
+  table{border-collapse:collapse;width:100%;font-size:13.5px;margin-top:6px}
+  th,td{text-align:left;padding:7px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+  th{font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+  td.num-col{text-align:right;font-variant-numeric:tabular-nums}
+  .cols{display:grid;grid-template-columns:1fr 1fr;gap:22px;flex:1;min-height:0}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px 16px}
+  .card h3{margin:0 0 6px;font-size:15px}
+  .card p{margin:0;font-size:13.5px;color:var(--muted)}
+  .pill{display:inline-block;padding:1px 8px;border-radius:999px;font-size:11.5px;font-weight:650}
+  .ok{color:var(--ok);background:#e8f5ec} .hold{color:var(--hold);background:#fdf3e0}
+  .rej{color:var(--rej);background:#fdeaea}
+  .title-slide{justify-content:center}
+  .meta{margin-top:26px;font-size:15px;color:var(--muted)}
+  .meta b{color:var(--ink)}
+  .rule{height:4px;width:70px;background:var(--accent);border-radius:2px;margin:22px 0}
+  .quote{border-left:3px solid var(--accent);padding-left:14px;color:var(--muted);font-size:15px;margin-top:14px}
+  .big{font-size:34px;font-weight:680;letter-spacing:-.02em}
+  .stat{display:flex;gap:26px;margin:10px 0 4px}
+  .stat div{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px 18px;flex:1}
+  .stat .n{font-size:26px;font-weight:680;letter-spacing:-.02em}
+  .stat .l{font-size:11px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted)}
+</style>
+
+<section class="slide title-slide">
+  <div class="kicker">SET University · GenAI Software Engineering · Homework 6</div>
+  <h1>Transaction Processing Pipeline</h1>
+  <div class="rule"></div>
+  <p class="lede">A four-stage payment pipeline built end to end by four AI workflow agents —
+  specification, code, tests, documentation — where every decision stays explainable after the fact.</p>
+  <div class="meta"><b>Andrii Shukailo</b> · @overgapo</div>
+  <div class="num">1</div>
+</section>
+
+<section class="slide">
+  <div class="kicker">The problem</div>
+  <h2>Money code fails quietly</h2>
+  <p class="lede">The defects that matter here look, in a diff, exactly like ordinary working code.</p>
+  <div class="cols">
+    <div>
+      <ul>
+        <li>A <b>float</b> where a <code>Decimal</code> belonged — off by a cent, found at reconciliation weeks later.</li>
+        <li>An <b>account number in a log line</b> — invisible until an audit.</li>
+        <li>A <b>filing treated as a hold</b> — a compliance obligation quietly turned into a blocked payment.</li>
+        <li>A <b>guessed FX rate</b> when the real one was missing — plausible, wrong, and unreviewable.</li>
+      </ul>
+      <div class="quote">So the design goal was not "make it work". It was: make every outcome
+      reconstructable by hand, months later.</div>
+    </div>
+    <div class="card">
+      <h3>What the pipeline answers, per transaction</h3>
+      <p style="margin-bottom:10px">Not just <i>what</i> happened — <i>why</i>, and <i>who decided</i>.</p>
+      <pre>"final_status": "held",
+"reason_code":  "HIGH_RISK",
+"decided_by":   "fraud_detector",
+"risk": {
+  "score": 60,
+  "band":  "HIGH",
+  "signals": ["HIGH_VALUE",
+              "VERY_HIGH_VALUE"]
+},
+"fx": { "rate": "1.0850",
+        "version": "2026-03-16.1" }</pre>
+    </div>
+  </div>
+  <div class="num">2</div>
+</section>
+
+<section class="slide">
+  <div class="kicker">Architecture</div>
+  <h2>Four stages, talking only through files</h2>
+  <pre style="flex:1;display:flex;align-items:center;justify-content:center;font-size:11px;line-height:1.5">
+   sample-transactions.json
+             │
+             ▼
+     shared/input/ ──▶ ┌─────────────────┐
+                       │  1. VALIDATOR   │ 10 ordered checks, first failure wins ──── rejected ──┐
+                       └────────┬────────┘                                                       │
+                                ▼                                                                │
+                       ┌─────────────────┐                                                       │
+                       │ 2. FRAUD DETECT │ additive score 0-100 + signals ──── held (≥ 60) ──────┤
+                       └────────┬────────┘                                                       │
+                                ▼                                                                │
+                       ┌─────────────────┐                                                       │
+                       │  3. COMPLIANCE  │ watchlist blocks · CTR records ──── held (match) ─────┤
+                       └────────┬────────┘                                                       │
+                                ▼                                                                ▼
+                       ┌─────────────────┐                                              shared/results/
+                       │  4. SETTLEMENT  │ FX → USD · 25 bps fee · net ──── settled ───▶ + summary.json
+                       └─────────────────┘                                                       │
+                                                                                                 ▼
+   shared/logs/audit.log ◀── one line per transition, accounts hashed      dashboard · MCP server</pre>
+  <p style="margin:10px 0 0;font-size:13.5px;color:var(--muted)">A stage claims a record into
+  <code>processing/</code>, writes atomically (<code>.tmp</code> + <code>os.replace</code>), and never
+  imports a sibling — enforced by an AST test, not by convention.</p>
+  <div class="num">3</div>
+</section>
+
+<section class="slide">
+  <div class="kicker">The four agents</div>
+  <h2>Each agent owns its artifacts</h2>
+  <table>
+    <thead><tr><th>Agent</th><th>Owns</th><th>Its "plus"</th><th>Must not</th></tr></thead>
+    <tbody>
+      <tr><td><b>1 — Specification</b></td><td><code>specification.md</code>, <code>agents.md</code></td>
+          <td>Skill <code>/write-spec</code></td><td>Write pipeline code — the spec is frozen first</td></tr>
+      <tr><td><b>2 — Code generation</b></td><td><code>pipeline/</code>, <code>frontend/</code>, <code>mcp/</code></td>
+          <td>MCP <b>context7</b>, 3 documented queries</td><td>Write its own tests, or relax a spec rule</td></tr>
+      <tr><td><b>3 — Unit tests</b></td><td><code>tests/</code>, the coverage gate</td>
+          <td>Hook blocking push under 80 %</td><td>Edit <code>pipeline/</code> to make a test pass</td></tr>
+      <tr><td><b>4 — Documentation</b></td><td><code>README</code>, <code>HOWTORUN</code>, deck</td>
+          <td>Author named in the README</td><td>Document behaviour it has not observed</td></tr>
+    </tbody>
+  </table>
+  <p style="margin-top:14px;font-size:13.5px;color:var(--muted)"><code>agents.md</code> is the contract
+  all four work under: money rules, PII rules, and the rule that a failing test is never fixed by
+  loosening the assertion.</p>
+  <div class="num">4</div>
+</section>
+
+<section class="slide">
+  <div class="kicker">Decision rules</div>
+  <h2>Closed sets, not "e.g."</h2>
+  <div class="cols">
+    <div class="card">
+      <h3>Validation — 10 checks, first failure wins</h3>
+      <p><code>MISSING_FIELD · INVALID_TIMESTAMP · INVALID_ACCOUNT_FORMAT · SAME_ACCOUNT ·
+      UNSUPPORTED_CURRENCY · MALFORMED_AMOUNT · NON_POSITIVE_AMOUNT · AMOUNT_SCALE_MISMATCH ·
+      AMOUNT_OUT_OF_RANGE · UNSUPPORTED_TRANSACTION_TYPE</code></p>
+      <p style="margin-top:10px">Scale follows the ISO 4217 exponent — 2 for USD, <b>0 for JPY</b>.
+      <code>"1000.5" JPY</code> is malformed input, not a value to round.</p>
+    </div>
+    <div class="card">
+      <h3>Fraud — additive, capped at 100</h3>
+      <table style="margin-top:0">
+        <tr><td>HIGH_VALUE ≥ 10 000</td><td class="num-col">40</td></tr>
+        <tr><td>VERY_HIGH_VALUE ≥ 50 000</td><td class="num-col">20</td></tr>
+        <tr><td>STRUCTURING [9 000, 10 000)</td><td class="num-col">25</td></tr>
+        <tr><td>UNUSUAL_HOUR 00:00–04:59 UTC</td><td class="num-col">20</td></tr>
+        <tr><td>CROSS_BORDER</td><td class="num-col">15</td></tr>
+        <tr><td>UNATTENDED_CHANNEL (api)</td><td class="num-col">10</td></tr>
+      </table>
+      <p style="margin-top:8px">LOW 0–24 · MEDIUM 25–59 · <b>HIGH ≥ 60 → held</b>. A score never
+      travels without the signals that produced it.</p>
+    </div>
+  </div>
+  <div class="num">5</div>
+</section>
+
+<section class="slide">
+  <div class="kicker">Demo</div>
+  <h2>Eight transactions, eight defined outcomes</h2>
+  <table>
+    <thead><tr><th>TXN</th><th>Amount</th><th>Decided by</th><th>Outcome</th><th>Why</th></tr></thead>
+    <tbody>
+      <tr><td><code>TXN001</code></td><td class="num-col">1 500.00 USD</td><td>settlement</td><td><span class="pill ok">settled</span></td><td>risk 0</td></tr>
+      <tr><td><code>TXN002</code></td><td class="num-col">25 000.00 USD</td><td>settlement</td><td><span class="pill ok">settled</span></td><td>risk 40 HIGH_VALUE · CTR filed, did not block</td></tr>
+      <tr><td><code>TXN003</code></td><td class="num-col">9 999.99 USD</td><td>compliance</td><td><span class="pill hold">held</span></td><td>WATCHLIST_MATCH · risk 25 STRUCTURING</td></tr>
+      <tr><td><code>TXN004</code></td><td class="num-col">500.00 EUR</td><td>settlement</td><td><span class="pill ok">settled</span></td><td>risk 45 · 02:47 UTC, cross-border, api channel</td></tr>
+      <tr><td><code>TXN005</code></td><td class="num-col">75 000.00 USD</td><td>fraud_detector</td><td><span class="pill hold">held</span></td><td>risk 60 HIGH → never reached settlement</td></tr>
+      <tr><td><code>TXN006</code></td><td class="num-col">200.00 XYZ</td><td>validator</td><td><span class="pill rej">rejected</span></td><td>UNSUPPORTED_CURRENCY</td></tr>
+      <tr><td><code>TXN007</code></td><td class="num-col">−100.00 GBP</td><td>validator</td><td><span class="pill rej">rejected</span></td><td>NON_POSITIVE_AMOUNT — not <code>abs()</code>-ed</td></tr>
+      <tr><td><code>TXN008</code></td><td class="num-col">3 200.00 USD</td><td>settlement</td><td><span class="pill ok">settled</span></td><td>risk 0</td></tr>
+    </tbody>
+  </table>
+  <p style="margin-top:12px;font-size:13.5px"><b>4 settled · 2 held · 2 rejected</b> —
+  settled gross 30 242.50 USD, fees 38.11, net 30 204.39. This table is an acceptance fixture:
+  the integration test asserts it row by row.</p>
+  <div class="num">6</div>
+</section>
+
+<section class="slide">
+  <div class="kicker">Verification</div>
+  <h2>Tests that assert the absence of things</h2>
+  <div class="stat">
+    <div><div class="n">232</div><div class="l">tests</div></div>
+    <div><div class="n">100 %</div><div class="l">coverage</div></div>
+    <div><div class="n">80 %</div><div class="l">push gate</div></div>
+    <div><div class="n">0</div><div class="l">floats in the money path</div></div>
+  </div>
+  <div class="cols" style="margin-top:14px">
+    <div>
+      <ul>
+        <li><b>AST scan</b> — no <code>float()</code> call, no float literal in <code>pipeline/</code>.</li>
+        <li><b>AST scan</b> — no stage module imports a sibling stage.</li>
+        <li><b>After a full run</b> — no <code>ACC-NNNN</code>, no <code>description</code> anywhere in the audit log.</li>
+        <li><code>log_event</code> <b>raises</b> rather than writing a line carrying either.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>The gate, verified by breaking it</h3>
+      <p>160 untested functions → coverage <b>63.64 %</b> → hook exits <b>2</b>, push blocked.<br><br>
+      One sabotaged assertion → suite red → exits <b>2</b>.<br><br>
+      <code>ls -la</code> → exits <b>0</b>, suite never runs.</p>
+      <p style="margin-top:10px">The threshold is passed to pytest by the gate, not read from
+      <code>pytest.ini</code> — a gate you can lower by editing the file it reads is not a gate.</p>
+    </div>
+  </div>
+  <div class="num">7</div>
+</section>
+
+<section class="slide">
+  <div class="kicker">MCP integration</div>
+  <h2>Two servers: one consumed, one built</h2>
+  <div class="cols">
+    <div class="card">
+      <h3>context7 — consumed during code generation</h3>
+      <p>Three queries, documented in <code>research-notes.md</code> with library IDs and what each
+      one changed.</p>
+      <p style="margin-top:10px"><b>The useful one corrected code I had already written.</b>
+      <code>POST /api/run</code> used Starlette's <code>run_in_threadpool</code> from an
+      <code>async def</code> — hand-rolling what FastAPI does from the signature. The docs' idiom is a
+      plain <code>def</code> path operation. One dependency dropped out of the file.</p>
+    </div>
+    <div class="card">
+      <h3>pipeline-status — built with FastMCP</h3>
+      <p><code>get_transaction_status(id)</code> · <code>list_pipeline_results()</code> ·
+      resource <code>pipeline://summary</code></p>
+      <p style="margin-top:10px">Read-only and <b>stateless</b>: stdio spawns a fresh process per
+      session, so every call reads <code>shared/results/</code> from disk and can never serve a stale
+      answer after a new run.</p>
+      <p style="margin-top:10px">Returns the same projection the dashboard uses — account numbers and
+      descriptions never leave the server.</p>
+    </div>
+  </div>
+  <div class="num">8</div>
+</section>
+
+<section class="slide">
+  <div class="kicker">Lessons learned</div>
+  <h2>What the process actually taught</h2>
+  <div class="cols">
+    <div>
+      <ul>
+        <li><b>The spec paid for itself at the §9 table.</b> Assigning every one of the 8 sample
+        records a defined outcome <i>before</i> coding turned the integration test into a transcription
+        job — and caught that a "compliance" stage with nothing to decide is untestable theatre.</li>
+        <li><b>Freeze the spec, then amend it deliberately.</b> Two implementation decisions drifted
+        from the document; both were written back into it in the same commit. Silent drift is how a
+        spec stops being trustworthy.</li>
+        <li><b>Verify by breaking, not by reading.</b> The coverage gate only became evidence once it
+        actually blocked a push twice.</li>
+      </ul>
+    </div>
+    <div>
+      <ul>
+        <li><b>Documentation lookup beats recall.</b> context7 found a real mistake in code that
+        already worked — the kind that passes tests and reviews.</li>
+        <li><b>Tests for absence are the ones that hold.</b> "No float in the money path" survives a
+        refactor by a developer who never read the spec; a comment does not.</li>
+        <li><b>Two debugging traps worth remembering:</b> an MCP stdio client that pipes every request
+        at once gets cut off at EOF; and a same-length edit with an older mtime leaves a stale
+        <code>.pyc</code> that fails a test you already fixed.</li>
+      </ul>
+    </div>
+  </div>
+  <div class="num">9</div>
+</section>

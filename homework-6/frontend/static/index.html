@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Transaction Pipeline Dashboard</title>
+<style>
+  :root{
+    color-scheme: light dark;
+    --bg:#f6f7f9; --panel:#fff; --ink:#15181d; --muted:#697180; --line:#e3e6ea;
+    --ok:#177245; --ok-bg:#e8f5ec; --hold:#96620a; --hold-bg:#fdf3e0; --rej:#a3242a; --rej-bg:#fdeaea;
+    --accent:#2b5bd7;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{ --bg:#14171c; --panel:#1b1f26; --ink:#e8eaed; --muted:#9aa3b2; --line:#2a303a;
+           --ok:#6cd39a; --ok-bg:#16301f; --hold:#e5b45c; --hold-bg:#33260f; --rej:#f08a8f; --rej-bg:#3a1a1c;
+           --accent:#7aa2ff; }
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+       font:14px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+  .wrap{max-width:1080px;margin:0 auto;padding:28px 20px 56px}
+  header{display:flex;flex-wrap:wrap;gap:16px;align-items:baseline;justify-content:space-between;margin-bottom:6px}
+  h1{font-size:20px;margin:0;letter-spacing:-.01em}
+  .sub{color:var(--muted);font-size:13px;margin:0 0 20px}
+  button{font:inherit;font-weight:600;color:#fff;background:var(--accent);border:0;border-radius:7px;
+         padding:9px 16px;cursor:pointer}
+  button:disabled{opacity:.55;cursor:progress}
+  .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:20px}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px 16px}
+  .card .n{font-size:26px;font-weight:650;letter-spacing:-.02em}
+  .card .l{color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.05em}
+  .card.settled .n{color:var(--ok)} .card.held .n{color:var(--hold)} .card.rejected .n{color:var(--rej)}
+  .tablewrap{background:var(--panel);border:1px solid var(--line);border-radius:10px;overflow-x:auto}
+  table{border-collapse:collapse;width:100%;min-width:760px}
+  th,td{text-align:left;padding:10px 14px;border-bottom:1px solid var(--line);vertical-align:top}
+  th{font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);font-weight:600}
+  tbody tr:last-child td{border-bottom:0}
+  td.num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+  .pill{display:inline-block;padding:2px 9px;border-radius:999px;font-size:12px;font-weight:600}
+  .pill.settled{color:var(--ok);background:var(--ok-bg)}
+  .pill.held{color:var(--hold);background:var(--hold-bg)}
+  .pill.rejected{color:var(--rej);background:var(--rej-bg)}
+  .sig{display:inline-block;margin:1px 4px 1px 0;padding:1px 7px;border:1px solid var(--line);
+       border-radius:5px;font-size:11px;color:var(--muted)}
+  .reason{font-size:12px;color:var(--muted)}
+  code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px}
+  .totals{margin-top:14px;color:var(--muted);font-size:13px}
+  .msg{padding:14px 16px;border:1px solid var(--line);border-radius:10px;background:var(--panel);color:var(--muted)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Transaction Pipeline</h1>
+    <button id="run">Run pipeline</button>
+  </header>
+  <p class="sub">validation → fraud detection → compliance → settlement · results read from <code>shared/results/</code></p>
+
+  <div id="cards" class="cards"></div>
+  <div id="body"><p class="msg">Loading…</p></div>
+  <p id="totals" class="totals"></p>
+</div>
+
+<script>
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+function renderCards(d){
+  const c = d.by_status || {};
+  $("cards").innerHTML = [
+    ["Total", d.total, ""],
+    ["Settled", c.settled || 0, "settled"],
+    ["Held", c.held || 0, "held"],
+    ["Rejected", c.rejected || 0, "rejected"],
+  ].map(([label, n, cls]) =>
+    `<div class="card ${cls}"><div class="n">${n}</div><div class="l">${label}</div></div>`
+  ).join("");
+}
+
+function renderTable(rows){
+  if(!rows.length){ $("body").innerHTML = '<p class="msg">No transactions in the latest run.</p>'; return; }
+  $("body").innerHTML = `<div class="tablewrap"><table>
+    <thead><tr>
+      <th>Transaction</th><th>Amount</th><th>Status</th><th>Risk</th>
+      <th>Signals</th><th>Reason</th><th>Net (USD)</th>
+    </tr></thead><tbody>${rows.map(r => `
+      <tr>
+        <td><code>${esc(r.transaction_id)}</code></td>
+        <td class="num">${esc(r.amount)} ${esc(r.currency)}</td>
+        <td><span class="pill ${esc(r.final_status)}">${esc(r.final_status)}</span></td>
+        <td class="num">${r.risk_score ?? "—"}${r.risk_band ? ` <span class="reason">${esc(r.risk_band)}</span>` : ""}</td>
+        <td>${(r.signals||[]).map(s => `<span class="sig">${esc(s)}</span>`).join("") || "—"}</td>
+        <td><code>${esc(r.reason_code)}</code>${r.detail ? `<div class="reason">${esc(r.detail)}</div>` : ""}
+            ${(r.filings||[]).map(f => `<span class="sig">${esc(f)}</span>`).join("")}</td>
+        <td class="num">${r.settlement ? esc(r.settlement.net) : "—"}</td>
+      </tr>`).join("")}</tbody></table></div>`;
+}
+
+function renderTotals(d){
+  const t = d.totals || {};
+  $("totals").textContent = t.settled_gross
+    ? `Settled gross ${t.settled_gross} ${t.settlement_currency} · fees ${t.fees} · net ${t.settled_net}`
+    : "";
+}
+
+async function load(){
+  try{
+    const res = await fetch("/api/results");
+    if(!res.ok){
+      const err = await res.json().catch(() => ({detail: res.statusText}));
+      $("body").innerHTML = `<p class="msg">${esc(err.detail)}</p>`;
+      $("cards").innerHTML = ""; $("totals").textContent = "";
+      return;
+    }
+    const data = await res.json();
+    renderCards(data); renderTable(data.transactions || []); renderTotals(data);
+  }catch(e){
+    $("body").innerHTML = `<p class="msg">Could not reach the API: ${esc(e.message)}</p>`;
+  }
+}
+
+$("run").addEventListener("click", async () => {
+  const btn = $("run"); btn.disabled = true; btn.textContent = "Running…";
+  try{ await fetch("/api/run", {method:"POST"}); await load(); }
+  finally{ btn.disabled = false; btn.textContent = "Run pipeline"; }
+});
+
+load();
+</script>
+</body>
+</html>
